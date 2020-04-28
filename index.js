@@ -23,7 +23,8 @@ bot.on('message', message => {
 
 
     switch(args[0]){
-        case 'r':
+        // Reminder Feature (Not Finished)
+        /*case 'r':
             message.channel.bulkDelete(1);
             if(message.author.bot) return;
             if(!message.member.roles.cache.some(r => r.name === "Reminder Manager")) {
@@ -64,14 +65,14 @@ bot.on('message', message => {
                         .setTimestamp()
             message.channel.send(reminderTest);
             message.channel.send(reminderAlert);
-            break;
+            break;*/
 
-        /*case 'clear':
+        case 'clear':
             if(!args[1]) return message.reply('Error, please define the number of messages you want to delete!')
             message.channel.bulkDelete(args[1]);
             break;
         
-        case 'v':
+        case 'version':
             message.channel.bulkDelete(1);
             const patchnotes = new Discord.MessageEmbed()
                         .setColor('#D2691E')
@@ -92,12 +93,9 @@ bot.on('message', message => {
                             { name: '\!help', value: 'Displays this message.'},
                             { name: '\!v', value: 'Displays my current version.'},
                             { name: '\!clear [number]', value: 'Clears a certain amount of messages.'},
-                            { name: '\!r [reminder(1 word)] [time in minutes]', value: 'Clears a certain amount of messages.'},
+                            { name: '\!r [reminder] [time in minutes]', value: 'Clears a certain amount of messages.'},
                         )
-
-                        .setTimestamp()
             message.channel.send(helpEmbed);
-            message.channel.send("**Note: Reminder word must be one word!(Temporarily)**")*/
     
 
 
