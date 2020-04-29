@@ -5,7 +5,7 @@ const token = BotToken.token;
 const embed = require('rich-embed');
 const PREFIX = '!';
 
-
+//this comment was made to test pushing
 var version = "Version 0.1" // Update
 var servers = {};
 
