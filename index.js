@@ -7,15 +7,12 @@ const PREFIX = '!';
 
 
 var version = "Version 0.1" // Update
-var servers = {};
+
 
 bot.on('ready', () =>{
     console.log('Im On');
 })
 
-function bulk() {
-    message.channel.bulkDelete(3)
-}
 
 bot.on('message', message => {
 
@@ -24,48 +21,90 @@ bot.on('message', message => {
 
     switch(args[0]){
         // Reminder Feature (Not Finished)
-        /*case 'r':
+        case 'r':
             message.channel.bulkDelete(1);
             if(message.author.bot) return;
-            if(!message.member.roles.cache.some(r => r.name === "Reminder Manager")) {
-                message.channel.send("You don't have permission to do that!")
-                message.channel.bulkDelete(1)
-                return;
-            }
-            if(!args[1]) {
-                message.reply('```Error! | Usage: !r [word] [minutes]```')
-                return;
-            }
-            if(!args[2]) {
-                message.reply('```Error! | Usage: !r [word] [minutes]```')
-                return;
-            }
+            // Variables 
+            let reminderTime = args[1];
+            let reminderVar = message.content.substring(3);
+            let reminderVarLetters = reminderVar.replace(/[0-9]/g, '').substring(2);
+            let reminderVarLettersBoolean = reminderVarLetters;
+            let reminderVarTime = reminderTime.replace(/[a-z]/g, '');
+            let reminderTimeFormat = 0;
+            let reminderVarMiliseconds = 0;
+            /* let reminderMins = reminderVar.includes("minutes");
+            let reminderHours = reminderVar.includes("hours"); */
             
-            let reminderWord = args[1];
-            let reminderTime = args[2];
-            let reminderTimeSeconds = (reminderTime * 1000);
-            let reminderTimeM = (reminderTimeSeconds * 60);
-            let reminderTimeMM = (reminderTimeM / 60000)
-            let reminderTimeHour = (reminderTimeMM / 60)
-            function reminder() {
-                message.channel.send('@everyone');
-                clearInterval(reminderTest)
+            /*if(reminderMins){
+                reminderTimeNew = reminderVarTimeM;
+                reminderTimeFormat = "minutes";
+                reminderFinal = reminderVarLetters2M.substring(1);
+                reminderTimeMilisecs = reminderTimeM;
+            }else if(reminderHours){
+                reminderTimeNew = reminderVarTimeH;
+                reminderTimeFormat = "hours";
+                reminderFinal = reminderVarLetters2H.substring(1);
+                reminderTimeMilisecs = reminderTimeH;
+            }*/
+
+            // Based off the delimiter, sets the time
+            switch (reminderVarLettersBoolean) {
+                case 's':
+                    reminderVarMiliseconds = reminderVarTime * 1000;
+                    reminderTimeFormat = "seconds";
+                    break;
+
+                case 'm':
+                    reminderVarMiliseconds = reminderVarTime * 1000 * 60;
+                    reminderTimeFormat = "minutes";
+                    break;
+
+                case 'h':
+                    reminderVarMiliseconds = reminderVarTime * 1000 * 60 * 60;
+                    reminderTimeFormat = "hours";
+                    break;
+
+                case 'd':
+                    reminderVarMiliseconds = reminderVarTime * 1000 * 60 * 60 * 24;
+                    reminderTimeFormat = "days";
+                    break;
+
+                /*default:
+                    reminderVarMiliseconds = reminderVarTime * 1000 * 60;
+                    reminderTimeFormat = "minutes";
+                    break;*/
             }
-            const reminderConfirmation = new Discord.MessageEmbed()
-                        .setColor('#D2691E')
-                        .setTitle('Reminder Set!')
-                        .setDescription('A **reminder** with theme **"' + reminderWord + '"** has been **scheduled** to alert @everyone in **' + reminderTime + ' minute(s)!**(' + reminderTimeHour.toFixed(2) + ' hours)')
-                        .setTimestamp()
-            message.channel.send(reminderConfirmation);
-            var reminderTest = setInterval(reminder, reminderTimeM);
-            const reminderAlert = new Discord.MessageEmbed()
-                        .setColor('#D2691E')
-                        .setTitle('Reminder Alert!')
-                        .setDescription('Everyone, the reminder with theme **"' + reminderWord + '"** is over!')
-                        .setTimestamp()
-            message.channel.send(reminderTest);
-            message.channel.send(reminderAlert);
-            break;*/
+        
+            
+            // Error check - Ignore
+            if(reminderTime < 0){
+                message.channel.send('Unexpected error');
+                return;
+            }
+            // First Embed
+            const reminder1 = new Discord.MessageEmbed()
+                    .setColor('#0297DB')
+                    .setTitle('Reminder Set!')
+                    .setDescription('A reminder **"' + reminderVarLetters + '"** has been set to go off in **' + reminderVarTime + " " + reminderTimeFormat + '!**')
+                    .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
+                    .setTimestamp()
+            message.channel.send(reminder1);
+            // Notification Embed
+            const notificationEmbed = new Discord.MessageEmbed()
+                    .setColor('#0297DB')
+                    .setTitle('Alert!')
+                    .setDescription('The reminder with name **"' + reminderVarLetters + '"** is over!')
+                    .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
+                    .setTimestamp()
+            // Notification Function
+            function reminderFunction(){
+                message.channel.send(notificationEmbed);
+                message.channel.send("@everyone");
+                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+            }
+            // Main Functionality
+            setTimeout(reminderFunction, reminderVarMiliseconds);
+            break;
 
         case 'clear':
             if(!args[1]) return message.reply('Error, please define the number of messages you want to delete!')
