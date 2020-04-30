@@ -22,70 +22,69 @@ bot.on('message', message => {
     switch(args[0]){
         // Reminder Feature (Not Finished)
         case 'r':
-            message.channel.bulkDelete(1);
+            try {
+                message.channel.bulkDelete(1);
             if(message.author.bot) return;
-            // Variables 
+            // Variables
             let reminderTime = args[1];
-            let reminderVar = message.content.substring(3);
-            let reminderVarLetters = reminderVar.replace(/[0-9]/g, '').substring(2);
-            let reminderVarLettersBoolean = reminderVarLetters;
-            let reminderVarTime = reminderTime.replace(/[a-z]/g, '');
+            let timeType = reminderTime.replace(/[0-9]/g, '').toString();
+            let originalMsg = message.content.toString()
+            let indexOfPhrase = 2
+            let originalMsgPhrase = originalMsg.replace('!r', '').replace(reminderTime, '').replace(" ", '');
+            let originalMsgTime = reminderTime.replace(/[a-z]/g, '');
+            console.log("originalMsg : " + originalMsg);
+            console.log("remiderTime : " + reminderTime);
+            console.log("originalMsgPhrase : " + originalMsgPhrase);
+            console.log("originalMsgTime : " + originalMsgTime);
+            console.log("timeType : " + timeType);
+            console.log(timeType.includes('s'))
             let reminderTimeFormat = 0;
-            let reminderVarMiliseconds = 0;
-            /* let reminderMins = reminderVar.includes("minutes");
-            let reminderHours = reminderVar.includes("hours"); */
-            
-            /*if(reminderMins){
-                reminderTimeNew = reminderVarTimeM;
-                reminderTimeFormat = "minutes";
-                reminderFinal = reminderVarLetters2M.substring(1);
-                reminderTimeMilisecs = reminderTimeM;
-            }else if(reminderHours){
-                reminderTimeNew = reminderVarTimeH;
-                reminderTimeFormat = "hours";
-                reminderFinal = reminderVarLetters2H.substring(1);
-                reminderTimeMilisecs = reminderTimeH;
-            }*/
+            let originalMsgMiliseconds = 0;
 
             // Based off the delimiter, sets the time
-            switch (reminderVarLettersBoolean) {
+            switch (timeType) {
                 case 's':
-                    reminderVarMiliseconds = reminderVarTime * 1000;
+                    originalMsgMiliseconds = originalMsgTime * 1000;
                     reminderTimeFormat = "seconds";
+                    console.log("Yo i'm in here");
                     break;
 
                 case 'm':
-                    reminderVarMiliseconds = reminderVarTime * 1000 * 60;
+                    originalMsgMiliseconds = originalMsgTime * 1000 * 60;
                     reminderTimeFormat = "minutes";
                     break;
 
                 case 'h':
-                    reminderVarMiliseconds = reminderVarTime * 1000 * 60 * 60;
+                    originalMsgMiliseconds = originalMsgTime * 1000 * 60 * 60;
                     reminderTimeFormat = "hours";
                     break;
 
                 case 'd':
-                    reminderVarMiliseconds = reminderVarTime * 1000 * 60 * 60 * 24;
+                    originalMsgMiliseconds = originalMsgTime * 1000 * 60 * 60 * 24;
                     reminderTimeFormat = "days";
                     break;
 
-                /*default:
-                    reminderVarMiliseconds = reminderVarTime * 1000 * 60;
+                default:
+                    originalMsgMiliseconds = originalMsgTime * 1000 * 60;
                     reminderTimeFormat = "minutes";
-                    break;*/
+                    break;
             }
-        
+            
+            
+            if(originalMsgTime == "") throw "empty";
+            if(isNaN(originalMsgTime)) throw "not a number";
+            if(originalMsgTime < 0)throw "ngtv number"
             
             // Error check - Ignore
-            if(reminderTime < 0){
-                message.channel.send('Unexpected error');
-                return;
-            }
+            // if(originalMsgTime){
+            //     message.channel.send(error);
+            //     return;
+            // }
             // First Embed
             const reminder1 = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Reminder Set!')
-                    .setDescription('A reminder **"' + reminderVarLetters + '"** has been set to go off in **' + reminderVarTime + " " + reminderTimeFormat + '!**')
+                    .setDescription('A reminder **"' + originalMsgPhrase + '"** has been set to go off in **' + originalMsgTime + " " + reminderTimeFormat + '!**')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             message.channel.send(reminder1);
@@ -93,18 +92,38 @@ bot.on('message', message => {
             const notificationEmbed = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Alert!')
-                    .setDescription('The reminder with name **"' + reminderVarLetters + '"** is over!')
+                    .setDescription('The reminder with name **"' + originalMsgPhrase + '"** is over!')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             // Notification Function
             function reminderFunction(){
                 message.channel.send(notificationEmbed);
+                //DONT FORGET TO ENABLE THIS vvvv
                 message.channel.send("@everyone");
                 setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
             }
             // Main Functionality
-            setTimeout(reminderFunction, reminderVarMiliseconds);
+            setTimeout(reminderFunction, originalMsgMiliseconds);
+            console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
             break;
+
+            } catch (error) {
+                const errorEMb = new Discord.MessageEmbed()
+                .setColor('#DC143C')
+                .setTitle('Error!')
+                .setDescription('Make sure you typed that correctly (!r {time} {Name of event})')
+                .setFooter(':/')
+                .setTimestamp()
+            message.channel.send(errorEMb);
+            }
+
+
+            
+
+
+
+
+
 
         case 'clear':
             if(!args[1]) return message.reply('Error, please define the number of messages you want to delete!')
