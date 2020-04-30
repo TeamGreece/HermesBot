@@ -7,7 +7,7 @@ const PREFIX = '!';
 
 
 var version = "Version 0.1" // Update
-
+var activeReminders = [];
 
 bot.on('ready', () =>{
     console.log('Im On');
@@ -17,7 +17,7 @@ bot.on('ready', () =>{
 bot.on('message', message => {
 
     let args = message.content.substring(PREFIX.length).split(" ");
-
+    
 
     switch(args[0]){
         // Reminder Feature (Not Finished)
@@ -28,18 +28,23 @@ bot.on('message', message => {
             // Variables
             let reminderTime = args[1];
             let timeType = reminderTime.replace(/[0-9]/g, '').toString();
-            let originalMsg = message.content.toString()
-            let indexOfPhrase = 2
+            let originalMsg = message.content.toString();
             let originalMsgPhrase = originalMsg.replace('!r', '').replace(reminderTime, '').replace(" ", '');
             let originalMsgTime = reminderTime.replace(/[a-z]/g, '');
-            console.log("originalMsg : " + originalMsg);
-            console.log("remiderTime : " + reminderTime);
-            console.log("originalMsgPhrase : " + originalMsgPhrase);
-            console.log("originalMsgTime : " + originalMsgTime);
-            console.log("timeType : " + timeType);
-            console.log(timeType.includes('s'))
             let reminderTimeFormat = 0;
             let originalMsgMiliseconds = 0;
+            
+
+            function debugging() {
+                console.log("originalMsg : " + originalMsg);
+                console.log("remiderTime : " + reminderTime);
+                console.log("originalMsgPhrase : " + originalMsgPhrase);
+                console.log("originalMsgTime : " + originalMsgTime);
+                console.log("timeType : " + timeType);
+                console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
+                console.log("Active reminders are : " + activeReminders);
+            }
+
 
             // Based off the delimiter, sets the time
             switch (timeType) {
@@ -68,6 +73,7 @@ bot.on('message', message => {
                     originalMsgMiliseconds = originalMsgTime * 1000 * 60;
                     reminderTimeFormat = "minutes";
                     break;
+
             }
             
             
@@ -75,11 +81,7 @@ bot.on('message', message => {
             if(isNaN(originalMsgTime)) throw "not a number";
             if(originalMsgTime < 0)throw "ngtv number"
             
-            // Error check - Ignore
-            // if(originalMsgTime){
-            //     message.channel.send(error);
-            //     return;
-            // }
+           
             // First Embed
             const reminder1 = new Discord.MessageEmbed()
                     .setColor('#0297DB')
@@ -88,6 +90,7 @@ bot.on('message', message => {
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             message.channel.send(reminder1);
+            
             // Notification Embed
             const notificationEmbed = new Discord.MessageEmbed()
                     .setColor('#0297DB')
@@ -95,17 +98,39 @@ bot.on('message', message => {
                     .setDescription('The reminder with name **"' + originalMsgPhrase + '"** is over!')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
+            
             // Notification Function
             function reminderFunction(){
                 message.channel.send(notificationEmbed);
                 //DONT FORGET TO ENABLE THIS vvvv
-                message.channel.send("@everyone");
-                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+                /*message.channel.send("@everyone");
+                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)*/
             }
+            
             // Main Functionality
             setTimeout(reminderFunction, originalMsgMiliseconds);
-            console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
+
+            activeReminders.push(originalMsgPhrase);
+            console.log(activeReminders);
+
+            setTimeout(function removeDone() {
+
+                var index = activeReminders.indexOf(originalMsgPhrase);
+                if (index > -1) {    activeReminders.splice(index, 1);}
+                if (!isNaN(activeReminders)) {
+                    console.log("Removed a done reminder. There are no active reminders");
+                    return activeReminders = [];
+                }else{
+                    console.log("Removed a done reminder. Active reminders: " +activeReminders); 
+                }
+                
+            }, originalMsgMiliseconds);
+
+
+            debugging();
+
             break;
+
 
             } catch (error) {
                 const errorEMb = new Discord.MessageEmbed()
@@ -118,13 +143,39 @@ bot.on('message', message => {
             }
 
 
+        case 'viewRem':
+            if (!isNaN(activeReminders)) {
+                const errorEMb = new Discord.MessageEmbed()
+                .setColor('#ffcc00')
+                .setTitle('There are no active reminders.')
+                .setFooter('PoseidonBot / Remind')
+                .setTimestamp()
+            message.channel.send(errorEMb);
+                return activeReminders = [];
+            }else{
+                const errorEMb = new Discord.MessageEmbed()
+                .setColor('#ffcc00')
+                .setTitle('Active Reminders are:')
+                .setDescription(activeReminders)
+                .setFooter('PoseidonBot / Remind')
+                .setTimestamp()
+            message.channel.send(errorEMb);
+            }
             
+            break;
 
-
-
-
-
-
+        // case'delRem':
+        //     let originalMsg = message.content.toString();
+        //     let delRem = originalMsg.replace('!delRem', '');
+        //     try {
+        //         if (activeReminders.find(delRem)) {
+        //             clearTimeout
+        //         } else {throw 'item is not in the list'
+                    
+        //         }
+        //     } catch (error) {
+                
+        //     }
         case 'clear':
             if(!args[1]) return message.reply('Error, please define the number of messages you want to delete!')
             message.channel.bulkDelete(args[1]);
