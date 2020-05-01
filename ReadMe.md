@@ -3,12 +3,12 @@ Poseidon is a _discord bot_ that was initially made for the _official TeamGreece
 
 ## Features:
 Initial Rlease  
-__!help:__ Shows a list of all available commands.  
-__!version:__ Shows the current bot version.  
-__!clear [number]:__ Clears a certain amound of messages.  
-__!r {time} {Name of event}:__ Sets a reminder.  
+_!help:_ Shows a list of all available commands.  
+_!version:_ Shows the current bot version.  
+_!clear [number]:_ Clears a certain amound of messages.  
+_!r {time} {Name of event}:_ Sets a reminder.  
 ============================================================
 Version 0.2  
-__!rview::__ Shows all active reminders.  
+_!rview::_ Shows all active reminders.  
 Version 0.3  
-__!rdel [reminder]:__ Deletes a selected reminder  
+_!rdel [reminder]:_ Deletes a selected reminder  
