@@ -90,11 +90,6 @@ bot.on('message', message => {
 
             }
             
-            
-            //if(originalMsgTime == "") throw "empty";
-            if(isNaN(originalMsgTime)) throw "not a number";
-            if(originalMsgTime < 0)throw "ngtv number"
-            
            
             // First Embed
             const reminder1 = new Discord.MessageEmbed()
@@ -148,8 +143,22 @@ bot.on('message', message => {
             debugging();
             console.log(activeReminders.indexOf(originalMsgPhrase));
 
-            break;
+            
 
+            if(originalMsgTime = "") {
+                console.log("empty")
+                throw "empty";}
+            if(isNaN(originalMsgPhrase)){
+                console.log("not a title")
+                throw "not a title";} 
+            if(isNaN(originalMsgTime)) {
+                console.log("not a num")
+                throw "not a number"}
+            if(originalMsgTime < 0){
+                console.log("ngtv number")
+                throw "ngtv number"}
+            
+            break;
 
             } catch (error) {
                 const errorEMb = new Discord.MessageEmbed()
