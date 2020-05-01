@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.2" // Update
+var version = "Version 0.3" // Update Readme
 var activeReminders = [];
 
 bot.on('ready', () =>{
@@ -22,6 +22,7 @@ bot.on('message', message => {
     switch(args[0]){
         // Reminder Feature (Not Finished)
         case 'r':
+            if(!message.member.roles.cache.some(r => r.name === "Reminder Manager")) return message.channel.send("You don't have permission to do that!")
             try {
                 message.channel.bulkDelete(1);
             if(message.author.bot) return;
@@ -51,7 +52,7 @@ bot.on('message', message => {
                 case 's':
                     originalMsgMiliseconds = originalMsgTime * 1000;
                     reminderTimeFormat = "seconds";
-                    console.log("Yo i'm in here");
+                    // console.log("Yo i'm in here");
                     break;
 
                 case 'm':
@@ -79,14 +80,14 @@ bot.on('message', message => {
             
             if(originalMsgTime == "") throw "empty";
             if(isNaN(originalMsgTime)) throw "not a number";
-            if(originalMsgTime < 0)throw "ngtv number"
+            if(originalMsgTime < 0) throw "ngtv number"
             
            
             // First Embed
             const reminder1 = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Reminder Set!')
-                    .setDescription('A reminder **"' + originalMsgPhrase + '"** has been set to go off in **' + originalMsgTime + " " + reminderTimeFormat + '!**')
+                    .setDescription('A reminder **"' + originalMsgPhrase.substring(1) + '"** has been set to go off in **' + originalMsgTime + " " + reminderTimeFormat + '!**')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             message.channel.send(reminder1);
@@ -95,7 +96,7 @@ bot.on('message', message => {
             const notificationEmbed = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Alert!')
-                    .setDescription('The reminder with name **"' + originalMsgPhrase + '"** is over!')
+                    .setDescription('The reminder with name **"' + originalMsgPhrase.substring(1) + '"** is over!')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             
@@ -200,9 +201,11 @@ bot.on('message', message => {
                         .setTitle('All commands listed below!')
                         .addFields(
                             { name: '\!help', value: 'Displays this message.'},
-                            { name: '\!v', value: 'Displays my current version.'},
+                            { name: '\!version', value: 'Displays my current version.'},
                             { name: '\!clear [number]', value: 'Clears a certain amount of messages.'},
-                            { name: '\!r [reminder] [time in minutes]', value: 'Clears a certain amount of messages.'},
+                            { name: '\!r {time} {Name of event}', value: 'Used to set up alarms to notify all the team.'},
+                            { name: '\!viewRem ', value: 'Shows all active reminders.'},
+
                         )
             message.channel.send(helpEmbed);
     
