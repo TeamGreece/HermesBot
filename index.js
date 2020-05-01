@@ -7,8 +7,19 @@ const PREFIX = '!';
 
 
 var version = "Version 0.1" // Update
-var activeReminders = [];
-var reminder; 
+var activeReminders = []; 
+var reminder = [];
+
+function set_time_out( id, code, time ) /// wrapper
+{
+
+    if( id in reminder )
+    {
+        clearTimeout( reminder[id] )
+    }
+
+    reminder[id] = setTimeout( code, time )
+}
 
 bot.on('ready', () =>{
     console.log('Im On');
@@ -80,7 +91,7 @@ bot.on('message', message => {
             }
             
             
-            if(originalMsgTime == "") throw "empty";
+            //if(originalMsgTime == "") throw "empty";
             if(isNaN(originalMsgTime)) throw "not a number";
             if(originalMsgTime < 0)throw "ngtv number"
             
@@ -108,10 +119,14 @@ bot.on('message', message => {
                 //DONT FORGET TO ENABLE THIS vvvv
                 /*message.channel.send("@everyone");
                 setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)*/
+                
             }
             
             // Main Functionality
-            reminder = setTimeout(reminderFunction, originalMsgMiliseconds);
+           
+            //reminder = setTimeout(reminderFunction, originalMsgMiliseconds);
+
+            set_time_out(originalMsgPhrase, reminderFunction, originalMsgMiliseconds);
 
             activeReminders.push(originalMsgPhrase);
             console.log(activeReminders);
@@ -145,7 +160,7 @@ bot.on('message', message => {
                 .setTimestamp()
             message.channel.send(errorEMb);
             }
-
+            break;
 
         case 'viewRem':
             if (!isNaN(activeReminders)) {
@@ -172,7 +187,8 @@ bot.on('message', message => {
             let originalMsg = message.content.toString();
             let originalMsgPhrase = originalMsg.replace('!delRem', '').replace(" ", '');
             console.log(originalMsgPhrase);
-            console.log(activeReminders.includes(originalMsgPhrase));
+            //console.log(reminder.includes(originalMsgPhrase));
+            console.log(reminder[originalMsgPhrase]);
             try {
                 
                 if (activeReminders.includes(originalMsgPhrase))
@@ -184,9 +200,20 @@ bot.on('message', message => {
                     .setFooter('PoseidonBot / Remind')
                     .setTimestamp()
                     message.channel.send(clearEmb);
+                    function removeDone() {
 
-
-                    clearTimeout(reminder);
+                        var index = activeReminders.indexOf(originalMsgPhrase);
+                        if (index > -1) {    activeReminders.splice(index, 1);}
+                        if (!isNaN(activeReminders)) {
+                            console.log("Removed a done reminder. There are no active reminders");
+                            return activeReminders = [];
+                        }else{
+                            console.log("Removed a done reminder. Active reminders: " +activeReminders); 
+                        }
+                        
+                    }
+                    removeDone();
+                    clearTimeout(reminder[originalMsgPhrase]);
                 } else {throw 'item is not in the list'}
             } catch (error) {
                 const errEMb = new Discord.MessageEmbed()
