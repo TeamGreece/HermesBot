@@ -7,7 +7,6 @@ _!help:_ Shows a list of all available commands.
 _!version:_ Shows the current bot version.  
 _!clear [number]:_ Clears a certain amound of messages.  
 _!r {time} {Name of event}:_ Sets a reminder.  
-============================================================
 Version 0.2  
 _!rview::_ Shows all active reminders.  
 Version 0.3  
