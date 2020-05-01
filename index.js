@@ -6,11 +6,12 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.3" // Update
+var version = "Version 0.2" // Update
 var activeReminders = []; 
 var reminder = [];
+var activeMeetings = [];
 
-function set_time_out( id, code, time ) /// wrapper
+function set_time_out( id, code, time ) // wrapper - gamato
 {
 
     if( id in reminder )
@@ -19,10 +20,12 @@ function set_time_out( id, code, time ) /// wrapper
     }
 
     reminder[id] = setTimeout( code, time )
-}
 
+}
 bot.on('ready', () =>{
     console.log('Im On');
+    bot.user.setActivity('Team Greece!', { type: 'WATCHING' })
+    
 })
 
 
@@ -32,9 +35,8 @@ bot.on('message', message => {
     
 
     switch(args[0]){
-        // Reminder Feature (Not Finished)
-        case 'r':
-            if(!message.member.roles.cache.some(r => r.name === "Reminder Manager")) return message.channel.send("You don't have permission to do that!")
+        // Reminder Feature (Officially finished)
+        case 'rset':
             try {
                 message.channel.bulkDelete(1);
             if(message.author.bot) return;
@@ -42,7 +44,7 @@ bot.on('message', message => {
             let reminderTime = args[1];
             let timeType = reminderTime.replace(/[0-9]/g, '').toString();
             let originalMsg = message.content.toString();
-            let originalMsgPhrase = originalMsg.replace('!r', '').replace(reminderTime, '').replace(" ", '').substring(1);
+            let originalMsgPhrase = originalMsg.replace('!rset', '').replace(reminderTime, '').replace(" ", '').substring(1);
             let originalMsgTime = reminderTime.replace(/[a-z]/g, '');
             let reminderTimeFormat = 0;
             let originalMsgMiliseconds = 0;
@@ -91,17 +93,12 @@ bot.on('message', message => {
 
             }
             
-            
-            //if(originalMsgTime == "") throw "empty";
-            if(isNaN(originalMsgTime)) throw "not a number";
-            if(originalMsgTime < 0) throw "ngtv number"
-            
            
             // First Embed
             const reminder1 = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Reminder Set!')
-                    .setDescription('A reminder **"' + originalMsgPhrase.substring(1) + '"** has been set to go off in **' + originalMsgTime + " " + reminderTimeFormat + '!**')
+                    .setDescription('A reminder **"' + originalMsgPhrase + '"** has been set to go off in **' + originalMsgTime + " " + reminderTimeFormat + '!**')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             message.channel.send(reminder1);
@@ -110,23 +107,19 @@ bot.on('message', message => {
             const notificationEmbed = new Discord.MessageEmbed()
                     .setColor('#0297DB')
                     .setTitle('Alert!')
-                    .setDescription('The reminder with name **"' + originalMsgPhrase.substring(1) + '"** is over!')
+                    .setDescription('The reminder with name **"' + originalMsgPhrase + '"** is over!')
                     .setFooter('Reminder set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .setTimestamp()
             
             // Notification Function
             function reminderFunction(){
                 message.channel.send(notificationEmbed);
-                //DONT FORGET TO ENABLE THIS vvvv
-                /*message.channel.send("@everyone");
-                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)*/
+                message.channel.send("@everyone");
+                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
                 
             }
             
             // Main Functionality
-           
-            //reminder = setTimeout(reminderFunction, originalMsgMiliseconds);
-
             set_time_out(originalMsgPhrase, reminderFunction, originalMsgMiliseconds);
 
             activeReminders.push(originalMsgPhrase);
@@ -149,8 +142,15 @@ bot.on('message', message => {
             debugging();
             console.log(activeReminders.indexOf(originalMsgPhrase));
 
+            
+            if(isNaN(originalMsgTime)) {
+                console.log("not a num")
+                throw "not a number"}
+            if(originalMsgTime < 0){
+                console.log("ngtv number")
+                throw "ngtv number"}
+            
             break;
-
 
             } catch (error) {
                 const errorEMb = new Discord.MessageEmbed()
@@ -165,28 +165,28 @@ bot.on('message', message => {
 
         case 'rview':
             if (!isNaN(activeReminders)) {
-                const errorEMb = new Discord.MessageEmbed()
-                .setColor('#ffcc00')
+                const noactiveEmb = new Discord.MessageEmbed()
+                .setColor('#42f5ce')
                 .setTitle('There are no active reminders.')
                 .setFooter('PoseidonBot / Remind')
                 .setTimestamp()
-            message.channel.send(errorEMb);
+            message.channel.send(noactiveEmb);
                 return activeReminders = [];
             }else{
-                const errorEMb = new Discord.MessageEmbed()
-                .setColor('#ffcc00')
+                const viewEMb = new Discord.MessageEmbed()
+                .setColor('#42f5ce')
                 .setTitle('Active Reminders are:')
                 .setDescription(activeReminders)
                 .setFooter('PoseidonBot / Remind')
                 .setTimestamp()
-            message.channel.send(errorEMb);
+            message.channel.send(viewEMb);
             }
             
             break;
 
-        case'rdel':
+            case'rdel':
             let originalMsg = message.content.toString();
-            let originalMsgPhrase = originalMsg.replace('!delRem', '').replace(" ", '');
+            let originalMsgPhrase = originalMsg.replace('!rdel', '').replace(" ", '');
             console.log(originalMsgPhrase);
             //console.log(reminder.includes(originalMsgPhrase));
             console.log(reminder[originalMsgPhrase]);
@@ -194,11 +194,10 @@ bot.on('message', message => {
                 
                 if (activeReminders.includes(originalMsgPhrase))
                  {  
-                    console.log("yo im in the if");
                     const clearEmb = new Discord.MessageEmbed()
-                    .setColor('#ffcc00')
+                    .setColor('#8442f5')
                     .setTitle('Reminder ' + originalMsgPhrase + " cleared!")
-                    .setFooter('PoseidonBot / Remind')
+                    .setFooter('PoseidonBot / Reminder Feature')
                     .setTimestamp()
                     message.channel.send(clearEmb);
                     function removeDone() {
@@ -217,17 +216,14 @@ bot.on('message', message => {
                     clearTimeout(reminder[originalMsgPhrase]);
                 } else {throw 'item is not in the list'}
             } catch (error) {
-                const errEMb = new Discord.MessageEmbed()
-                    .setColor('#ffcc00')
+                const rdelErrorEmbed = new Discord.MessageEmbed()
+                    .setColor('#8442f5')
                     .setTitle('Error')
-                    .setFooter('PoseidonBot / Remind')
+                    .setFooter('PoseidonBot / Reminder Feature')
                     .setTimestamp()
-                message.channel.send(errEMb);
-             }
-        case 'clear':
-            if(!args[1]) return message.reply('Error, please define the number of messages you want to delete!')
-            message.channel.bulkDelete(args[1]);
-            break;
+                message.channel.send(rdelErrorEmbed);
+                break;
+            }       
         
         case 'version':
             message.channel.bulkDelete(1);
@@ -235,42 +231,32 @@ bot.on('message', message => {
                         .setColor('#D2691E')
                         .setTitle(version + '!')
                         .setDescription("I'm currently running in " + version)
-                        .addFields(
-                            { name: '!r', value:'Permitted people can use the !r command to set a reminder(Usage in !help)' },
-                        )
+                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
                         .setTimestamp()
             message.channel.send(patchnotes);
             break;
+
         case 'help':
             message.channel.bulkDelete(1);
             const helpEmbed = new Discord.MessageEmbed()
-                        .setColor('#FFFF00')
+                        .setColor('#291127')
                         .setTitle('All commands listed below!')
                         .addFields(
                             { name: '\!help', value: 'Displays this message.'},
                             { name: '\!version', value: 'Displays my current version.'},
-                            { name: '\!clear [number]', value: 'Clears a certain amount of messages.'},
-                            { name: '\!r {time} {Name of event}) ', value: 'Sets a reminder.'},
+                            { name: '\!rset {time} {Name of event}) ', value: 'Sets a reminder.'},
                             { name: '\!rview', value: 'Shows all current reminders.'},
                             { name: '\!rdel [reminder]', value: 'Cancels and deletes the selected reminder.'},
+                            { name: '\!github', value: 'More about this project'},
 
                         )
             message.channel.send(helpEmbed);
+            break;
+        case 'github':
+            message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master");
     
-
-
-
-
-
-
-
-
-
-
         }
 });
-
-
 
 
 bot.login(token);
