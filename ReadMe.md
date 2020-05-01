@@ -9,4 +9,4 @@ __!clear [number]:__ Clears a certain amound of messages.
 __!r {time} {Name of event}:__ Sets a reminder.  
 ============================================================
 Version 0.2  
-__!viewRem:__ Shows all active reminders.  
+__!viewRem:__ Shows all active reminders. 
