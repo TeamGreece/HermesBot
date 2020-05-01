@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.1" // Update
+var version = "Version 0.2" // Update
 var activeReminders = [];
 
 bot.on('ready', () =>{
