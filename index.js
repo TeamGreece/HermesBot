@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.1" // Update
+var version = "Version 0.3" // Update
 var activeReminders = []; 
 var reminder = [];
 
@@ -34,6 +34,7 @@ bot.on('message', message => {
     switch(args[0]){
         // Reminder Feature (Not Finished)
         case 'r':
+            if(!message.member.roles.cache.some(r => r.name === "Reminder Manager")) return message.channel.send("You don't have permission to do that!")
             try {
                 message.channel.bulkDelete(1);
             if(message.author.bot) return;
@@ -162,7 +163,7 @@ bot.on('message', message => {
             }
             break;
 
-        case 'viewRem':
+        case 'rview':
             if (!isNaN(activeReminders)) {
                 const errorEMb = new Discord.MessageEmbed()
                 .setColor('#ffcc00')
@@ -183,7 +184,7 @@ bot.on('message', message => {
             
             break;
 
-        case'delRem':
+        case'rdel':
             let originalMsg = message.content.toString();
             let originalMsgPhrase = originalMsg.replace('!delRem', '').replace(" ", '');
             console.log(originalMsgPhrase);
@@ -247,9 +248,12 @@ bot.on('message', message => {
                         .setTitle('All commands listed below!')
                         .addFields(
                             { name: '\!help', value: 'Displays this message.'},
-                            { name: '\!v', value: 'Displays my current version.'},
+                            { name: '\!version', value: 'Displays my current version.'},
                             { name: '\!clear [number]', value: 'Clears a certain amount of messages.'},
-                            { name: '\!r [reminder] [time in minutes]', value: 'Clears a certain amount of messages.'},
+                            { name: '\!r {time} {Name of event}) ', value: 'Sets a reminder.'},
+                            { name: '\!rview', value: 'Shows all current reminders.'},
+                            { name: '\!rdel [reminder]', value: 'Cancels and deletes the selected reminder.'},
+
                         )
             message.channel.send(helpEmbed);
     
