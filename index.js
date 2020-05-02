@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.3" // Update
+var version = "Version 0.2.9" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
