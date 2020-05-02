@@ -32,7 +32,7 @@ bot.on('ready', () =>{
 bot.on('message', message => {
 
     let args = message.content.substring(PREFIX.length).split(" ");
-    
+    if(message.author.bot) return;
 
     switch(args[0]){
         // Reminder Feature (Officially finished)
@@ -254,8 +254,8 @@ bot.on('message', message => {
             break;
         case 'github':
             message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master");
-    
-        }
+        break;
+    }
 });
 
 
