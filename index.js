@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.2.9" // Update
+var version = "Version 0.3.0" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
@@ -14,6 +14,7 @@ var totalAnswers = [];
 let peopleYes = [];
 let peopleMaybe = [];
 let peopleNo = [];
+let peopleAll = [];
 
 
 
@@ -29,6 +30,7 @@ function set_time_out( id, code, time )
 
 bot.on('ready', () =>{
     console.log('Im On');
+   // bot.channels.cache.get("706144360353235049").send("Im On")
     bot.user.setActivity('Development District!', { type: 'WATCHING' })
     
 })
@@ -65,6 +67,13 @@ bot.on('message', message => {
                 console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
                 console.log("Active reminders are : " + activeReminders);
                 console.log("\n");
+               // bot.channels.cache.get("706144360353235049").send("originalMsg : " + originalMsg)
+               // bot.channels.cache.get("706144360353235049").send("remiderTime : " + reminderTime)
+               // bot.channels.cache.get("706144360353235049").send("originalMsgPhrase : " + originalMsgPhrase)
+               // bot.channels.cache.get("706144360353235049").send("originalMsgTime : " + originalMsgTime)
+               // bot.channels.cache.get("706144360353235049").send("timeType : " + timeType)
+               // bot.channels.cache.get("706144360353235049").send("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat)
+               // bot.channels.cache.get("706144360353235049").send("Active reminders are : " + activeReminders)
             }
 
 
@@ -129,6 +138,7 @@ bot.on('message', message => {
 
             activeReminders.push(originalMsgPhrase);
             console.log(activeReminders);
+           // bot.channels.cache.get("706144360353235049").send(activeReminders)
 
             setTimeout(function removeDone() {
 
@@ -136,9 +146,11 @@ bot.on('message', message => {
                 if (index > -1) {    activeReminders.splice(index, 1);}
                 if (!isNaN(activeReminders)) {
                     console.log("Removed a done reminder. There are no active reminders");
+                   // bot.channels.cache.get("706144360353235049").send("Removed a done reminder. There are no active reminders")
                     return activeReminders = [];
                 }else{
                     console.log("Removed a done reminder. Active reminders: " +activeReminders); 
+                   // bot.channels.cache.get("706144360353235049").send("Removed a done reminder. Active reminders: " +activeReminders)
                 }
                 
             }, originalMsgMiliseconds);
@@ -146,13 +158,17 @@ bot.on('message', message => {
 
             debugging();
             console.log(activeReminders.indexOf(originalMsgPhrase));
+           // bot.channels.cache.get("706144360353235049").send(originalMsgPhrase)
 
             
             if(isNaN(originalMsgTime)) {
                 console.log("not a num")
+               // bot.channels.cache.get("706144360353235049").send("not a num")
+
                 throw "not a number"}
             if(originalMsgTime < 0){
                 console.log("ngtv number")
+               // bot.channels.cache.get("706144360353235049").send("ngtv number")
                 throw "ngtv number"}
             
             break;
@@ -193,8 +209,9 @@ bot.on('message', message => {
             let originalMsg = message.content.toString();
             let originalMsgPhrase = originalMsg.replace('!rdel', '').replace(" ", '');
             console.log(originalMsgPhrase);
-            //console.log(reminder.includes(originalMsgPhrase));
             console.log(reminder[originalMsgPhrase]);
+           // bot.channels.cache.get("706144360353235049").send(console.log(originalMsgPhrase))
+           // bot.channels.cache.get("706144360353235049").send(reminder[originalMsgPhrase])
             try {
                 
                 if (activeReminders.includes(originalMsgPhrase))
@@ -211,15 +228,18 @@ bot.on('message', message => {
                         if (index > -1) {    activeReminders.splice(index, 1);}
                         if (!isNaN(activeReminders)) {
                             console.log("Removed a done reminder. There are no active reminders");
+                           // bot.channels.cache.get("706144360353235049").send("Removed a done reminder. There are no active reminders")
                             return activeReminders = [];
                         }else{
-                            console.log("Removed a done reminder. Active reminders: " +activeReminders); 
+                            console.log("Removed a done reminder. Active reminders: " + activeReminders); 
+                           // bot.channels.cache.get("706144360353235049").send("Removed a done reminder. Active reminders: " + activeReminders)
                         }
                         
                     }
                     removeDone();
                     clearTimeout(reminder[originalMsgPhrase]);
                 } else {throw 'item is not in the list'}
+                
             } catch (error) {
                 const rdelErrorEmbed = new Discord.MessageEmbed()
                     .setColor('#8442f5')
@@ -227,20 +247,10 @@ bot.on('message', message => {
                     .setFooter('PoseidonBot / Reminder Feature')
                     .setTimestamp()
                 message.channel.send(rdelErrorEmbed);
-                break;
-            }       
+                
+            }    
+            break;   
         
-        case 'version':
-            message.channel.bulkDelete(1);
-            const patchnotes = new Discord.MessageEmbed()
-                        .setColor('#D2691E')
-                        .setTitle(version + '!')
-                        .setDescription("I'm currently running in " + version)
-                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
-                        .setTimestamp()
-            message.channel.send(patchnotes);
-            break;
-
         case 'help':
             message.channel.bulkDelete(1);
             const helpEmbed = new Discord.MessageEmbed()
@@ -252,11 +262,24 @@ bot.on('message', message => {
                             { name: '\!rset {time} {Name of event}) ', value: 'Sets a reminder.'},
                             { name: '\!rview', value: 'Shows all current reminders.'},
                             { name: '\!rdel [reminder]', value: 'Cancels and deletes the selected reminder.'},
-                            { name: '\!github', value: 'More about this project'},
-
+                            { name: '\!announce {Your message}', value: 'Admins can write a message and I will notify everyone!'},
+                            { name: '\!say {Your message}', value: 'Anyone can write their message and I will say it!'},
+                            { name: '\!meeting {Day} {Time} {Title}', value: 'Admins can set up general meetings. Should be used in the <#706152226543894578> channel.'},
+                            { name: '\!meetingV', value: 'Admins can view whoever has responded to the meeting request.'},
                         )
             message.channel.send(helpEmbed);
             break;
+        case 'version':
+            message.channel.bulkDelete(1);
+            const patchnotes = new Discord.MessageEmbed()
+                        .setColor('#D2691E')
+                        .setTitle(version + '!')
+                        .setDescription("I'm currently running in " + version)
+                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
+                        .setTimestamp()
+            message.channel.send(patchnotes);
+            break;
+    
         case 'github':
             message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master");
             break;
@@ -282,6 +305,7 @@ bot.on('message', message => {
             let initialMeetingDate = args[1];
             let meetingDate = initialMeetingDate.toLowerCase();
             console.log(meetingDate);
+           // bot.channels.cache.get("706144360353235049").send("meetingDate")
             let meetingTheme = meetingMessage.replace('!meeting', '').replace(initialMeetingDate, '').replace(meetingTime, '').replace(" ", '').substring(2);
             let meetingAuthor = message.member.user.tag;
             const allDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -291,17 +315,18 @@ bot.on('message', message => {
                     .setColor('#00FF00')
                     .setTitle('Yes :white_check_mark:!')
                     .setDescription('You have reacted with **"Yes!"**')
-                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
             const meetingMaybe = new Discord.MessageEmbed()
                     .setColor('#DC143C')
                     .setTitle('Maybe :woman_shrugging:!')
                     .setDescription('You have reacted with **"Maybe!"**')
-                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
             const meetingNo = new Discord.MessageEmbed()
                     .setColor('#D95417')
                     .setTitle('No :x:!')
                     .setDescription('You have reacted with **"No"!**')
-                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
+            const meetingAlreadyAssigned = new Discord.MessageEmbed()
+                    .setColor('#DC143C')
+                    .setTitle('Error!')
+                    .setDescription("You can't do that again!")
             function meetingDebugging() {
                 console.log("\n");
                 console.log("meetingMessage : " + meetingMessage);
@@ -311,6 +336,13 @@ bot.on('message', message => {
                 console.log("A meeting has been set: " + meetingTheme + ", alarms on " + meetingDate + " at " + meetingTime);
                 console.log("Author : " + meetingAuthor);
                 console.log("\n");
+               // bot.channels.cache.get("706144360353235049").send("meetingMessage : " + meetingMessagee)
+               // bot.channels.cache.get("706144360353235049").send("meetingTime : " + meetingTime)
+               // bot.channels.cache.get("706144360353235049").send("meetingTheme : " + meetingTheme)
+               // bot.channels.cache.get("706144360353235049").send("meetingDate : " + meetingDate)
+               // bot.channels.cache.get("706144360353235049").send("A meeting has been set: " + meetingTheme + ", alarms on " + meetingDate + " at " + meetingTime)
+               // bot.channels.cache.get("706144360353235049").send("Author : " + meetingAuthor)
+
             }
             if(allDays.includes(meetingDate, 0)){
                 dayConfirmation = true;
@@ -320,14 +352,14 @@ bot.on('message', message => {
 
             if(dayConfirmation){
                 console.log('Day Approved');
+               // bot.channels.cache.get("706144360353235049").send('Day Approved')
             }
             else{
                 console.log('Day not approved')
+               // bot.channels.cache.get("706144360353235049").send('Day not approved')
                 throw "Day not approved"
             }
-            //if(isNaN(meetingTime)) throw "not a number";
-            //if(meetingTime.includes(/[a-z]/g)) throw "not a number";
-            
+        
             // First Meeting Embed
             const meetingEmbed1 = new Discord.MessageEmbed()
                     .setColor('#00FF00')
@@ -354,24 +386,60 @@ bot.on('message', message => {
             message.channel.send(notificationEmbedMeeting);
             const collector = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
             collector.on('collect', message => {
-                if (message.content.toLowerCase() == "yes") {
-                    console.log('he said yes');
-                    let yesPerson = '<@' + message.member.id + '>';
-                    peopleYes.push(yesPerson);
-                    console.log(peopleYes);
-                    message.channel.send(meetingYes)
-                } else if (message.content.toLowerCase() == "maybe") {
-                    console.log('he said maybe');
-                    let maybePerson = '<@' + message.member.id + '>';
-                    peopleMaybe.push(maybePerson);
-                    console.log(peopleMaybe);
-                    message.channel.send(meetingMaybe)
-                } else if (message.content.toLowerCase() == "no") {
-                    console.log('he said no');
-                    let noPerson = '<@' + message.member.id + '>';
-                    peopleNo.push(noPerson);
-                    console.log(peopleNo);
-                    message.channel.send(meetingNo)
+                if(message.content.toLowerCase() == "yes") {
+                    if(!peopleAll.includes('<@' + message.member.id + '>')){
+                        console.log(peopleAll)
+                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
+                        console.log('they said yes');
+                        let yesPerson = '<@' + message.member.id + '>';
+                        peopleYes.push(yesPerson);
+                        console.log(peopleYes);
+                       // bot.channels.cache.get("706144360353235049").send(peopleYes)
+                        message.channel.send(meetingYes)
+                        peopleAll = peopleYes.concat(peopleMaybe, peopleNo);
+                    }else{
+                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                        message.channel.send(meetingAlreadyAssigned);
+                        console.log(peopleAll);
+                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
+                        return;
+                    }
+                }else if (message.content.toLowerCase() == "maybe") {
+                    if(!peopleAll.includes('<@' + message.member.id + '>')){
+                        console.log(peopleAll)
+                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
+                        console.log('they said maybe');
+                        let maybePerson = '<@' + message.member.id + '>';
+                        peopleMaybe.push(maybePerson);
+                        console.log(peopleMaybe);
+                       // bot.channels.cache.get("706144360353235049").send(peopleMaybe)
+                        message.channel.send(meetingMaybe)
+                        peopleAll = peopleMaybe.concat(peopleYes, peopleNo);
+                    }else{
+                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                        message.channel.send(meetingAlreadyAssigned);
+                        console.log(peopleAll);
+                       // bot.channels.cache.get("706144360353235049").send(peo)
+                        return;
+                    }
+                }else if (message.content.toLowerCase() == "no") {
+                    if(!peopleAll.includes('<@' + message.member.id + '>')){
+                        console.log(peopleAll)
+                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
+                        console.log('they said no');
+                        let noPerson = '<@' + message.member.id + '>';
+                        peopleNo.push(noPerson);
+                        console.log(peopleNo);
+                       // bot.channels.cache.get("706144360353235049").send(peopleNo)
+                        message.channel.send(meetingNo)
+                        peopleAll = peopleNo.concat(peopleMaybe, peopleYes);
+                    }else{
+                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                        message.channel.send(meetingAlreadyAssigned);
+                        console.log(peopleAll);
+                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
+                        return;
+                    }
                 }
             });
                 
@@ -390,6 +458,10 @@ bot.on('message', message => {
 
         break;
         case 'meetingV':
+            if(!message.member.roles.cache.some(r => r.name === "Admin")) {
+                setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                return message.channel.send("You don't have permission to do that!");
+            }
             // Embeds
             const YesEmb = new Discord.MessageEmbed()
                     .setColor('#00FF00')
@@ -409,10 +481,7 @@ bot.on('message', message => {
                     .setDescription(peopleNo.toString())
                     .setFooter('PoseidonBot / Smart Meeting Feature')
                     .setTimestamp()
-            if(!message.member.roles.cache.some(r => r.name === "Admin")) {
-                setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                return message.channel.send("You don't have permission to do that!");
-            }
+            
             if (!isNaN(peopleYes) && !isNaN(peopleMaybe) && !isNaN(peopleNo)) {
                 const noactiveEmb = new Discord.MessageEmbed()
                 .setColor('#42f5ce')
@@ -426,6 +495,7 @@ bot.on('message', message => {
             if(isNaN(peopleMaybe)) message.channel.send(MaybeEmb)
             if(isNaN(peopleNo)) message.channel.send(NoEmb)
         break;
+
         }
 });
 
