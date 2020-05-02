@@ -6,25 +6,30 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.2" // Update
+var version = "Version 0.2.9" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
+var totalAnswers = [];
+let peopleYes = [];
+let peopleMaybe = [];
+let peopleNo = [];
 
-function set_time_out( id, code, time ) // wrapper - gamato
+
+
+
+function set_time_out( id, code, time ) 
 {
-
     if( id in reminder )
     {
         clearTimeout( reminder[id] )
     }
-
     reminder[id] = setTimeout( code, time )
-
 }
+
 bot.on('ready', () =>{
     console.log('Im On');
-    bot.user.setActivity('Team Greece!', { type: 'WATCHING' })
+    bot.user.setActivity('Development District!', { type: 'WATCHING' })
     
 })
 
@@ -254,9 +259,174 @@ bot.on('message', message => {
             break;
         case 'github':
             message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master");
-        break;
-    }
-});
+            break;
+        case 'say':
+            message.channel.bulkDelete(1);
+            let sayMessage = message.content.toString();
+            let sayMessageUnprefixed = sayMessage.replace('!say', '').substring(1);
+            message.channel.send(sayMessageUnprefixed);
+            break;
+        case 'announce':
+            if(!message.member.roles.cache.some(r => r.name === "Admin")) return message.channel.send("You don't have permission to do that!")
+            message.channel.bulkDelete(1);
+            let announceMessage = message.content.toString();
+            let announceMessageUnprefixed = announceMessage.replace('!announce', '').substring(1);
+            message.channel.send('@everyone, ' + announceMessageUnprefixed);
+            break;
+        case 'meeting':
+            if(!message.member.roles.cache.some(r => r.name === "Admin")) return message.channel.send("You don't have permission to do that!")
+            try {
+            message.react('📅');
+            let meetingMessage = message.content.toString();
+            let meetingTime = args[2];
+            let initialMeetingDate = args[1];
+            let meetingDate = initialMeetingDate.toLowerCase();
+            console.log(meetingDate);
+            let meetingTheme = meetingMessage.replace('!meeting', '').replace(initialMeetingDate, '').replace(meetingTime, '').replace(" ", '').substring(2);
+            let meetingAuthor = message.member.user.tag;
+            const allDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+            var dayConfirmation;            
+            // Embeds
+            const meetingYes = new Discord.MessageEmbed()
+                    .setColor('#00FF00')
+                    .setTitle('Yes :white_check_mark:!')
+                    .setDescription('You have reacted with **"Yes!"**')
+                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
+            const meetingMaybe = new Discord.MessageEmbed()
+                    .setColor('#DC143C')
+                    .setTitle('Maybe :woman_shrugging:!')
+                    .setDescription('You have reacted with **"Maybe!"**')
+                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
+            const meetingNo = new Discord.MessageEmbed()
+                    .setColor('#D95417')
+                    .setTitle('No :x:!')
+                    .setDescription('You have reacted with **"No"!**')
+                    .setFooter(message.member.user.tag, message.author.displayAvatarURL())
+            function meetingDebugging() {
+                console.log("\n");
+                console.log("meetingMessage : " + meetingMessage);
+                console.log("meetingTime : " + meetingTime);
+                console.log("meetingTheme : " + meetingTheme);
+                console.log("meetingDate : " + meetingDate);
+                console.log("A meeting has been set: " + meetingTheme + ", alarms on " + meetingDate + " at " + meetingTime);
+                console.log("Author : " + meetingAuthor);
+                console.log("\n");
+            }
+            if(allDays.includes(meetingDate, 0)){
+                dayConfirmation = true;
+            }else{
+                dayConfirmation = false;
+            }
 
+            if(dayConfirmation){
+                console.log('Day Approved');
+            }
+            else{
+                console.log('Day not approved')
+                throw "Day not approved"
+            }
+            //if(isNaN(meetingTime)) throw "not a number";
+            //if(meetingTime.includes(/[a-z]/g)) throw "not a number";
+            
+            // First Meeting Embed
+            const meetingEmbed1 = new Discord.MessageEmbed()
+                    .setColor('#00FF00')
+                    .setTitle('Meeting Set!')
+                    .setDescription('The **meeting** has been set correctly! I will now notify **everyone**! Meeting Name: **"' + meetingTheme + '"!**')
+                    .setFooter('Meeting set by ' + message.member.user.tag, message.author.displayAvatarURL())
+                    .setTimestamp()
+            message.channel.send(meetingEmbed1);
+            meetingDebugging();
+
+
+            // Notification-DM embed
+            const notificationEmbedMeeting = new Discord.MessageEmbed()
+                    .setColor('#92000A')
+                    .setTitle('Alert! Meeting Set!')
+                    .setDescription('**' + meetingAuthor + ' **has arranged a general meeting with theme **"' + meetingTheme + '"**.')
+                    .setAuthor('Meeting set by ' + message.member.user.tag, message.author.displayAvatarURL())
+                    .addFields(
+                        {name: 'Meeting Day', value:  meetingDate.charAt(0).toUpperCase() + meetingDate.substring(1) + " 📅"},
+                        {name: 'Meeting Time', value: meetingTime},
+                    )
+                    .setFooter('Write "Yes", "Maybe" or "No" to show availability')
+                    .setTimestamp()
+            message.channel.send(notificationEmbedMeeting);
+            const collector = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
+            collector.on('collect', message => {
+                if (message.content.toLowerCase() == "yes") {
+                    console.log('he said yes');
+                    let yesPerson = '<@' + message.member.id + '>';
+                    peopleYes.push(yesPerson);
+                    console.log(peopleYes);
+                    message.channel.send(meetingYes)
+                } else if (message.content.toLowerCase() == "maybe") {
+                    console.log('he said maybe');
+                    let maybePerson = '<@' + message.member.id + '>';
+                    peopleMaybe.push(maybePerson);
+                    console.log(peopleMaybe);
+                    message.channel.send(meetingMaybe)
+                } else if (message.content.toLowerCase() == "no") {
+                    console.log('he said no');
+                    let noPerson = '<@' + message.member.id + '>';
+                    peopleNo.push(noPerson);
+                    console.log(peopleNo);
+                    message.channel.send(meetingNo)
+                }
+            });
+                
+
+        
+        } catch (error) {
+            const meetingErrorEmbed = new Discord.MessageEmbed()
+            .setColor('#DC143C')
+            .setTitle('Error!')
+            .setDescription('Make sure you typed that correctly (!meeting {day} {time} {Name of meeting})')
+            .setFooter(':/')
+            .setTimestamp()
+        message.channel.send(meetingErrorEmbed);
+        setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+        }
+
+        break;
+        case 'meetingV':
+            // Embeds
+            const YesEmb = new Discord.MessageEmbed()
+                    .setColor('#00FF00')
+                    .setTitle('Reacted with :white_check_mark:!')
+                    .setDescription(peopleYes.toString())
+                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setTimestamp()
+            const MaybeEmb = new Discord.MessageEmbed()
+                    .setColor('#DC143C')
+                    .setTitle('Reacted with :woman_shrugging:!')
+                    .setDescription(peopleMaybe.toString())
+                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setTimestamp()
+            const NoEmb = new Discord.MessageEmbed()
+                    .setColor('#D95417')
+                    .setTitle('Reacted with :x:!')
+                    .setDescription(peopleNo.toString())
+                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setTimestamp()
+            if(!message.member.roles.cache.some(r => r.name === "Admin")) {
+                setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                return message.channel.send("You don't have permission to do that!");
+            }
+            if (!isNaN(peopleYes) && !isNaN(peopleMaybe) && !isNaN(peopleNo)) {
+                const noactiveEmb = new Discord.MessageEmbed()
+                .setColor('#42f5ce')
+                .setTitle('No one has reacted :frowning:')
+                .setFooter('PoseidonBot / Smart Meeting Feature')
+                .setTimestamp()
+            message.channel.send(noactiveEmb);
+                return peopleYes = [];
+            }
+            if(isNaN(peopleYes)) message.channel.send(YesEmb)
+            if(isNaN(peopleMaybe)) message.channel.send(MaybeEmb)
+            if(isNaN(peopleNo)) message.channel.send(NoEmb)
+        break;
+        }
+});
 
 bot.login(token);
