@@ -37,7 +37,7 @@ bot.on('ready', () =>{
 
 
 bot.on('message', message => {
-
+    if(message.author.bot) return;
     let args = message.content.substring(PREFIX.length).split(" ");
     if(message.author.bot) return;
 
@@ -494,6 +494,79 @@ bot.on('message', message => {
             if(isNaN(peopleYes)) message.channel.send(YesEmb)
             if(isNaN(peopleMaybe)) message.channel.send(MaybeEmb)
             if(isNaN(peopleNo)) message.channel.send(NoEmb)
+        break;
+
+        case 'poll' :
+            let pollTitle = message.content.toString().replace("!poll", '').substring(1);
+            let options = [];
+            let showOptions = [];
+            //let length = options.length
+            let emojis = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
+            let emojiCount = options.length
+            let cancelPoll = true;
+
+            console.log(pollTitle)
+            const pollObject = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
+            //console.log(length)
+            console.log(emojiCount)
+            
+            const pollEmb = new Discord.MessageEmbed()
+                .setColor('#32908F')
+                .setTitle('Poll ' + pollTitle)
+                .setFooter('PoseidonBot / Poll Feature')
+                .setTimestamp()
+            message.channel.send(pollEmb)
+            
+            
+            pollObject.on('collect', message => {
+                if(!message.author.bot){
+                    if (!message.content.toString() == '') {
+                        if (cancelPoll){
+                            if(message.content.toString().toLowerCase() == "end") {
+                                cancelPoll = false;
+                                message.channel.send('Poll has been made successfully')
+                                console.log('Poll Operation Failed Successfully') // ?
+                               
+                                for (x=0;x < options.length; x++) {
+                                    showOptions.push(emojis[x] + " " + options[x])
+                                    console.log(showOptions[x])
+                                }
+                                const pollEmb = new Discord.MessageEmbed()
+                                    .setColor('#32908F')
+                                    .setTitle('Poll ' + pollTitle)
+                                    .setDescription(showOptions)
+                                    .setFooter('PoseidonBot / Poll Feature')
+                                    .setTimestamp()
+                                message.channel.send(pollEmb).then(sentEmbed => {
+                                for (x=0;x < emojiCount; x++) {
+                                    sentEmbed.react(emojis[x])
+                                    console.log("yo bitch")
+                                }
+                    
+                                })
+                                return;
+                                
+                            }
+                        else{
+                                console.log('hola ich bin here')
+                                console.log(message.content.toString())
+                                let option = message.content.toString()
+                                options.push(option)
+                                message.channel.send('Element has been added successfully. If you rather add more elements, go on or if you wish to end type "end"')
+                                console.log(options)
+                                console.log(showOptions)
+                        }
+                    }
+                    }
+                }
+            });
+            
+            //message.react('5️⃣')
+
+            // for (var x of options.length) {
+            //     message.react(":five:")
+            // }
+               
         break;
 
         }
