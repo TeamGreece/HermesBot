@@ -513,6 +513,7 @@ bot.on('message', message => {
             const pollEmb = new Discord.MessageEmbed()
                 .setColor('#32908F')
                 .setTitle('Poll ' + pollTitle)
+                .setDescription('To add elements to the poll, simply type one at a time below')
                 .setFooter('PoseidonBot / Poll Feature')
                 .setTimestamp()
             message.channel.send(pollEmb)
@@ -520,8 +521,13 @@ bot.on('message', message => {
             
             pollObject.on('collect', message => {
                 if(!message.author.bot){
-                    if (!message.content.toString() == '') {
+                    if (!message.content.toString() == ''){
                         if (cancelPoll){
+                            if(message.content.toString().toLowerCase() == 'cancel'){
+                                cancelPoll = false;
+                                message.channel.send('Poll has been canceled syccessfully')
+                                return;
+                            }
                             if(message.content.toString().toLowerCase() == "end") {
                                 cancelPoll = false;
                                 message.channel.send('Poll has been made successfully')
@@ -537,16 +543,17 @@ bot.on('message', message => {
                                     .setDescription(showOptions)
                                     .setFooter('PoseidonBot / Poll Feature')
                                     .setTimestamp()
-                                message.channel.send(pollEmb).then(sentEmbed => {
-                                for (x=0;x < emojiCount; x++) {
-                                    sentEmbed.react(emojis[x])
-                                    console.log("yo bitch")
-                                }
+                                message.channel.send(pollEmb).then(embedMessage => {
+                                    for (t=0;t < showOptions.length; t++) {
+                                        embedMessage.react(emojis[t])
+                                    }
+                                });
                     
-                                })
+                                
                                 return;
                                 
                             }
+                        
                         else{
                                 console.log('hola ich bin here')
                                 console.log(message.content.toString())
@@ -556,9 +563,10 @@ bot.on('message', message => {
                                 console.log(options)
                                 console.log(showOptions)
                         }
-                    }
+                        }
                     }
                 }
+                
             });
             
             //message.react('5️⃣')
