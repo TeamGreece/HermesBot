@@ -37,8 +37,8 @@ const patchnotes = new Discord.MessageEmbed()
 bot.on('ready', () =>{
     console.log('Im On');
    // bot.channels.cache.get("706144360353235049").send("Im On")
-    bot.user.setActivity('Development District!', { type: 'WATCHING' })
-    bot.channels.cache.get("705834537309044798").send(patchnotes)
+    bot.user.setActivity('Team Greece!', { type: 'WATCHING' })
+    bot.channels.cache.get("706456626143428628").send(patchnotes)
     
 })
 
