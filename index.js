@@ -6,7 +6,7 @@ const embed = require('rich-embed');
 const PREFIX = '!';
 
 
-var version = "Version 0.3" // Update
+var version = "Version 0.4" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
@@ -27,11 +27,18 @@ function set_time_out( id, code, time )
     }
     reminder[id] = setTimeout( code, time )
 }
+const patchnotes = new Discord.MessageEmbed()
+                        .setColor('#291127')
+                        .setTitle(version + '!')
+                        .setDescription("I'm currently running in " + version)
+                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
+                        .setTimestamp()
 
 bot.on('ready', () =>{
     console.log('Im On');
    // bot.channels.cache.get("706144360353235049").send("Im On")
     bot.user.setActivity('Development District!', { type: 'WATCHING' })
+    bot.channels.cache.get("705834537309044798").send(patchnotes)
     
 })
 
@@ -271,12 +278,6 @@ bot.on('message', message => {
             break;
         case 'version':
             message.channel.bulkDelete(1);
-            const patchnotes = new Discord.MessageEmbed()
-                        .setColor('#D2691E')
-                        .setTitle(version + '!')
-                        .setDescription("I'm currently running in " + version)
-                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
-                        .setTimestamp()
             message.channel.send(patchnotes);
             break;
     
@@ -512,7 +513,7 @@ bot.on('message', message => {
             
             const pollEmb = new Discord.MessageEmbed()
                 .setColor('#32908F')
-                .setTitle('Poll ' + pollTitle)
+                .setTitle('Poll with title "' + pollTitle + '" has been initialized')
                 .setDescription('To add elements to the poll, simply type one at a time below')
                 .setFooter('PoseidonBot / Poll Feature')
                 .setTimestamp()
@@ -539,9 +540,10 @@ bot.on('message', message => {
                                 }
                                 const pollEmb = new Discord.MessageEmbed()
                                     .setColor('#32908F')
-                                    .setTitle('Poll ' + pollTitle)
+                                    .setTitle('Poll "' + pollTitle + '"')
                                     .setDescription(showOptions)
                                     .setFooter('PoseidonBot / Poll Feature')
+                                    .setAuthor('Poll started by ' + message.member.user.tag, message.author.displayAvatarURL())
                                     .setTimestamp()
                                 message.channel.send(pollEmb).then(embedMessage => {
                                     for (t=0;t < showOptions.length; t++) {
