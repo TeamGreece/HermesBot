@@ -273,6 +273,7 @@ bot.on('message', message => {
                             { name: '\!say {Your message}', value: 'Anyone can write their message and I will say it!'},
                             { name: '\!meeting {Day} {Time} {Title}', value: 'Admins can set up general meetings. Should be used in the <#706152226543894578> channel.'},
                             { name: '\!meetingV', value: 'Admins can view whoever has responded to the meeting request.'},
+                            { name: '\!poll {title}', value: 'Used to create polls. After using, you will be asked to insert values one by one. These will be what users will be able to vote on.'},
                         )
             message.channel.send(helpEmbed);
             break;
