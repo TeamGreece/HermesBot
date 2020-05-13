@@ -8,7 +8,7 @@ All current and future versions that are and will be supported with security upd
 | 4.1.x   | :white_check_mark: |  
 | 3.0.x   | :white_check_mark: |  
 | 2.0.x   | :white_check_mark: |  
-| < 1.0   | :white_check_mark  |  
+| < 1.0   | :white_check_mark: |  
 
 ## Reporting a Vulnerability  
 
