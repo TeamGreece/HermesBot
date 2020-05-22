@@ -4,9 +4,10 @@ const BotToken = require("./token.json")
 const token = BotToken.token;
 const embed = require('rich-embed');
 const PREFIX = '!';
+const fs = require('fs')
 
 
-var version = "Version 0.4" // Update
+var version = "Version 0.5" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
@@ -17,7 +18,7 @@ let peopleNo = [];
 let peopleAll = [];
 
 
-//test
+
 
 function set_time_out( id, code, time ) 
 {
@@ -33,6 +34,11 @@ const patchnotes = new Discord.MessageEmbed()
                         .setDescription("I'm currently running in " + version)
                         .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
                         .setTimestamp()
+function attachIsImage(msgAttach) {
+    var url = msgAttach.url;
+    //True if this url is a png image.
+    return url.indexOf("png", url.length - "png".length /*or 3*/) !== -1;
+}
 
 bot.on('ready', () =>{
     console.log('Im On');
@@ -45,8 +51,16 @@ bot.on('ready', () =>{
 bot.on('message', message => {
     if(message.author.bot) return;
     let args = message.content.substring(PREFIX.length).split(" ");
-    if(message.author.bot) return;
-
+    if(message.channel.id == 705834537309044798 || 705694869678718997){
+        var Attachment = (message.attachments).array();
+        if (message.attachments.size > 0) {
+            message.channel.send('A copy of the file sent by ' + message.member.user.tag + ' is now sent to #files!')
+            console.log("New Attachment")
+            // console.log(Attachment[0].url);
+            bot.channels.cache.get('711249792151453697').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
+            
+        }
+    }
     switch(args[0]){
         // Reminder Feature (Officially finished)
         case 'rset':
@@ -557,7 +571,6 @@ bot.on('message', message => {
                             }
                         
                         else{
-                                console.log('hola ich bin here')
                                 console.log(message.content.toString())
                                 let option = message.content.toString()
                                 options.push(option)
@@ -571,13 +584,92 @@ bot.on('message', message => {
                 
             });
             
-            //message.react('5️⃣')
 
-            // for (var x of options.length) {
-            //     message.react(":five:")
-            // }
                
-        break;
+        break;   
+        case 'save':
+            message.channel.bulkDelete(1);
+            let cancelSave = true;
+            let nameofSave = message.content.toString().replace(args[0], '').substring(2);
+            var saveFiles = fs.readdirSync('./Saves');
+            console.log(nameofSave);
+            const saveObject = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
+            const saveEmb = new Discord.MessageEmbed()
+                                    .setColor('#291127')
+                                    .setTitle('Save with name "' + nameofSave + '"')
+                                    .setDescription('Write below what you want to save!')
+                                    .setFooter('PoseidonBot / Save Feature')
+            const saveEmb2 = new Discord.MessageEmbed()
+                                    .setColor('#291127')
+                                    .setTitle('Saved successfully!')
+                                    .setDescription('You can use !save to see all current saves!')
+                                    .setFooter('PoseidonBot / Save Feature')
+            const saveEmb3 = new Discord.MessageEmbed()
+                                    .setColor('#FFFF00')
+                                    .setTitle('All saves listed below!')
+                                    .setDescription(saveFiles)
+                                    .setFooter('PoseidonBot / Save Feature')
+            if(args[1]){
+                message.channel.send(saveEmb)
+                saveObject.on('collect', message => {
+                    if(!message.author.bot){
+                        if(cancelSave){
+                            if (!message.content.toString() == ''){
+                                let dataSave = message.content.toString().replace(args[0], '');
+                                fs.writeFile('./Saves/' + nameofSave + '.txt', dataSave, { flag: 'w' }, (err) => {
+                                    if(err) throw err;
+                                    console.log('saved')
+                                })
+                                message.channel.send(saveEmb2)
+                                setTimeout(function(){message.channel.bulkDelete(3)}, 4000)
+                                cancelSave = false;
+                                return;
+                            }
+                        }
+                    }
+                });
+            }else if(!args[1]){
+                message.channel.send(saveEmb3)
+            }
+            break;
+            case 'recall':
+                try{
+                    message.channel.bulkDelete(1);
+                    var saveFiles = fs.readdirSync('./Saves');
+                    let nameofSaveRecall = message.content.toString().replace(args[0], '').substring(2);
+                    const recallEmbed = new Discord.MessageEmbed()
+                                        .setColor('#FFFF00')
+                                        .setTitle('Successfully recalled file named "' + nameofSaveRecall + '"')
+                                        .setFooter('PoseidonBot / Recall Feature')
+                    console.log(nameofSaveRecall)
+                    fs.readFile('./Saves/' + nameofSaveRecall + '.txt', 'utf8', (err, savedDataRecall) => {
+                        if(err) throw err;
+                        message.channel.send(recallEmbed)
+                        message.channel.send('```' + savedDataRecall + '```')
+                    })
+                } catch (error) {
+                    const recallError = new Discord.MessageEmbed()
+                    .setColor('#DC143C')
+                    .setTitle('Error!')
+                    .setDescription('Unknown error | Make sure you entered a valid file name!')
+                    .setFooter(':/')
+                    .setTimestamp()
+                message.channel.send(recallError);
+                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+                }
+                
+                
+
+
+
+            break;
+
+
+
+
+
+
+
 
         }
 });
