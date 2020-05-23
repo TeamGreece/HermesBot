@@ -287,6 +287,9 @@ bot.on('message', message => {
                             { name: '\!meeting {Day} {Time} {Title}', value: 'Admins can set up general meetings. Should be used in the <#706152226543894578> channel.'},
                             { name: '\!meetingV', value: 'Admins can view whoever has responded to the meeting request.'},
                             { name: '\!poll {title}', value: 'Used to create polls. After using, you will be asked to insert values one by one. These will be what users will be able to vote on.'},
+                            { name: '\!save {title}', value: 'Creates a new file in which data can be stored. If there is not a second argument, it will display all current saves!'},
+                            { name: '\!recall', value: 'Recalls an already existing save.'},
+                            { name: '\!saveDelete {title}', value: '**Admins** can delete an existing save.'},
                         )
             message.channel.send(helpEmbed);
             break;
