@@ -51,7 +51,7 @@ bot.on('ready', () =>{
 bot.on('message', message => {
     if(message.author.bot) return;
     let args = message.content.substring(PREFIX.length).split(" ");
-    if(message.channel.id == 705834537309044798 || 705694869678718997){
+    if(message.channel.id == 696005404840427590 || 696005770965155911 || 696005802905043065 || 696005830364889128){
         var Attachment = (message.attachments).array();
         if (message.attachments.size > 0) {
             message.channel.send('A copy of the file sent by ' + message.member.user.tag + ' is now sent to #files!')
