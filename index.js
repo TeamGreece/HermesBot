@@ -57,7 +57,7 @@ bot.on('message', message => {
             message.channel.send('A copy of the file sent by ' + message.member.user.tag + ' is now sent to #files!')
             console.log("New Attachment")
             // console.log(Attachment[0].url);
-            bot.channels.cache.get('711249792151453697').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
+            bot.channels.cache.get('696005900863012866').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
             
         }
     }
