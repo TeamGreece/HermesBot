@@ -7,7 +7,7 @@ const PREFIX = '!';
 const fs = require('fs')
 
 
-var version = "Version 0.5" // Update
+var version = "Version 0.6" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
