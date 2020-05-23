@@ -592,7 +592,7 @@ bot.on('message', message => {
             let cancelSave = true;
             let nameofSave = message.content.toString().replace(args[0], '').substring(2);
             var saveFiles = fs.readdirSync('./Saves');
-            console.log(nameofSave);
+            // console.log(nameofSave);
             const saveObject = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
             const saveEmb = new Discord.MessageEmbed()
                                     .setColor('#291127')
@@ -604,32 +604,55 @@ bot.on('message', message => {
                                     .setTitle('Saved successfully!')
                                     .setDescription('You can use !save to see all current saves!')
                                     .setFooter('PoseidonBot / Save Feature')
-            const saveEmb3 = new Discord.MessageEmbed()
-                                    .setColor('#FFFF00')
-                                    .setTitle('All saves listed below!')
-                                    .setDescription(saveFiles)
-                                    .setFooter('PoseidonBot / Save Feature')
+            const saveAlreadyExists = new Discord.MessageEmbed()
+                                    .setColor('#DC143C')
+                                    .setTitle('Error!')
+                                    .setDescription('Save exists! Please try a different name!')
+                                    .setFooter(':/')
+
             if(args[1]){
-                message.channel.send(saveEmb)
+                if(!saveFiles.includes(nameofSave)){
+                    message.channel.send(saveEmb)
+                var saveFiles = fs.readdirSync('./Saves');
                 saveObject.on('collect', message => {
                     if(!message.author.bot){
                         if(cancelSave){
                             if (!message.content.toString() == ''){
                                 let dataSave = message.content.toString().replace(args[0], '');
-                                fs.writeFile('./Saves/' + nameofSave + '.txt', dataSave, { flag: 'w' }, (err) => {
+                                fs.writeFile('./Saves/' + nameofSave, dataSave, { flag: 'w' }, (err) => {
                                     if(err) throw err;
-                                    console.log('saved')
+                                    // console.log('saved')
                                 })
                                 message.channel.send(saveEmb2)
                                 setTimeout(function(){message.channel.bulkDelete(3)}, 4000)
                                 cancelSave = false;
                                 return;
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }else{
+                    message.channel.send(saveAlreadyExists);
+                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+                }
+                
             }else if(!args[1]){
-                message.channel.send(saveEmb3)
+                if (!isNaN(saveFiles)) {
+                    const noSaves = new Discord.MessageEmbed()
+                    .setColor('#42f5ce')
+                    .setTitle('There are no saves.')
+                    .setFooter('PoseidonBot / Save Feature')
+                    .setTimestamp()
+                message.channel.send(noSaves);
+                }else{
+                    const viewSaves = new Discord.MessageEmbed()
+                    .setColor('#42f5ce')
+                    .setTitle('All saves listed below:')
+                    .setDescription(saveFiles)
+                    .setFooter('PoseidonBot / Save Feature')
+                    .setTimestamp()
+                message.channel.send(viewSaves);
+                }
             }
             break;
             case 'recall':
@@ -641,23 +664,70 @@ bot.on('message', message => {
                                         .setColor('#FFFF00')
                                         .setTitle('Successfully recalled file named "' + nameofSaveRecall + '"')
                                         .setFooter('PoseidonBot / Recall Feature')
-                    console.log(nameofSaveRecall)
-                    fs.readFile('./Saves/' + nameofSaveRecall + '.txt', 'utf8', (err, savedDataRecall) => {
-                        if(err) throw err;
-                        message.channel.send(recallEmbed)
-                        message.channel.send('```' + savedDataRecall + '```')
-                    })
+                    if(saveFiles.includes(nameofSaveRecall)){
+                        fs.readFile('./Saves/' + nameofSaveRecall, 'utf8', (err, savedDataRecall) => {
+                            if(err) throw err;
+                            message.channel.send(recallEmbed)
+                            message.channel.send('```' + savedDataRecall + '```')
+                            console.log(nameofSaveRecall)
+                        })
+                    }else{
+                    const recallError = new Discord.MessageEmbed()
+                        .setColor('#DC143C')
+                        .setTitle('Error!')
+                        .setDescription('Unknown error | Make sure you entered a valid file name!')
+                        .setFooter(':/')
+                        .setTimestamp()
+                    message.channel.send(recallError);
+                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+
+                    }
+                    
+                    
                 } catch (error) {
                     const recallError = new Discord.MessageEmbed()
-                    .setColor('#DC143C')
-                    .setTitle('Error!')
-                    .setDescription('Unknown error | Make sure you entered a valid file name!')
-                    .setFooter(':/')
-                    .setTimestamp()
-                message.channel.send(recallError);
-                setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+                        .setColor('#DC143C')
+                        .setTitle('Error!')
+                        .setDescription('Unknown error | Make sure you entered a valid file name!')
+                        .setFooter(':/')
+                        .setTimestamp()
+                    message.channel.send(recallError);
+                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
                 }
                 
+                
+
+
+
+            break;
+            case 'saveDelete':
+                var saveFiles = fs.readdirSync('./Saves');
+                let saveDeleteFile = message.content.toString().replace('!saveDelete ', '')
+                const saveDeleteEmb = new Discord.MessageEmbed()
+                                        .setColor('#8B0000')
+                                        .setTitle('Successfully deleted file named "' + saveDeleteFile + '"')
+                                        .setFooter('PoseidonBot / Recall Feature')
+                if(!message.member.roles.cache.some(r => r.name === "Admin")) {
+                    setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+                    return message.channel.send("You don't have permission to do that!");
+                }
+                if(saveFiles.includes(saveDeleteFile)){
+                    message.channel.bulkDelete(1)
+                    fs.unlink('./Saves/' + saveDeleteFile, (err) => {
+                        if(err) throw err;
+                        message.channel.send(saveDeleteEmb)
+                    })
+                }else{
+                    message.channel.bulkDelete(1)
+                    const saveDeleteEmb = new Discord.MessageEmbed()
+                        .setColor('#DC143C')
+                        .setTitle('Error!')
+                        .setDescription('Unknown error | Make sure you entered a valid file name!')
+                        .setFooter(':/')
+                        .setTimestamp()
+                    message.channel.send(saveDeleteEmb);
+                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+                }
                 
 
 
