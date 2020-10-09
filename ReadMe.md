@@ -1,5 +1,5 @@
-# Poseidon Discord Bot
-Poseidon is a _discord bot_ that was initially made for the _official TeamGreece Discord server_.
+# Hermes Discord Bot
+Hermes is a _discord bot_ that was initially made for the _official TeamGreece Discord server_.
 
 ## Features:
 ### Initial Rlease   

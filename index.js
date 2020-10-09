@@ -32,7 +32,7 @@ const patchnotes = new Discord.MessageEmbed()
                         .setColor('#291127')
                         .setTitle(version + '!')
                         .setDescription("I'm currently running in " + version)
-                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master")
+                        .setFooter( "For more info on the versions visit our Github https://github.com/TeamGreece/HermesBot/tree/master")
                         .setTimestamp()
 function attachIsImage(msgAttach) {
     var url = msgAttach.url;
@@ -210,7 +210,7 @@ bot.on('message', message => {
                 const noactiveEmb = new Discord.MessageEmbed()
                 .setColor('#42f5ce')
                 .setTitle('There are no active reminders.')
-                .setFooter('PoseidonBot / Remind')
+                .setFooter('HermesBot / Remind')
                 .setTimestamp()
             message.channel.send(noactiveEmb);
                 return activeReminders = [];
@@ -219,7 +219,7 @@ bot.on('message', message => {
                 .setColor('#42f5ce')
                 .setTitle('Active Reminders are:')
                 .setDescription(activeReminders)
-                .setFooter('PoseidonBot / Remind')
+                .setFooter('HermesBot / Remind')
                 .setTimestamp()
             message.channel.send(viewEMb);
             }
@@ -240,7 +240,7 @@ bot.on('message', message => {
                     const clearEmb = new Discord.MessageEmbed()
                     .setColor('#8442f5')
                     .setTitle('Reminder ' + originalMsgPhrase + " cleared!")
-                    .setFooter('PoseidonBot / Reminder Feature')
+                    .setFooter('HermesBot / Reminder Feature')
                     .setTimestamp()
                     message.channel.send(clearEmb);
                     function removeDone() {
@@ -265,7 +265,7 @@ bot.on('message', message => {
                 const rdelErrorEmbed = new Discord.MessageEmbed()
                     .setColor('#8442f5')
                     .setTitle('Error')
-                    .setFooter('PoseidonBot / Reminder Feature')
+                    .setFooter('HermesBot / Reminder Feature')
                     .setTimestamp()
                 message.channel.send(rdelErrorEmbed);
                 
@@ -300,7 +300,7 @@ bot.on('message', message => {
             break;
     
         case 'github':
-            message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/PoseidonBot/tree/master");
+            message.channel.send("For more info on the versions visit our Github https://github.com/TeamGreece/HermesBot/tree/master");
             break;
         case 'say':
             message.channel.bulkDelete(1);
@@ -486,26 +486,26 @@ bot.on('message', message => {
                     .setColor('#00FF00')
                     .setTitle('Reacted with :white_check_mark:!')
                     .setDescription(peopleYes.toString())
-                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setFooter('HermesBot / Smart Meeting Feature')
                     .setTimestamp()
             const MaybeEmb = new Discord.MessageEmbed()
                     .setColor('#DC143C')
                     .setTitle('Reacted with :woman_shrugging:!')
                     .setDescription(peopleMaybe.toString())
-                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setFooter('HermesBot / Smart Meeting Feature')
                     .setTimestamp()
             const NoEmb = new Discord.MessageEmbed()
                     .setColor('#D95417')
                     .setTitle('Reacted with :x:!')
                     .setDescription(peopleNo.toString())
-                    .setFooter('PoseidonBot / Smart Meeting Feature')
+                    .setFooter('HermesBot / Smart Meeting Feature')
                     .setTimestamp()
             
             if (!isNaN(peopleYes) && !isNaN(peopleMaybe) && !isNaN(peopleNo)) {
                 const noactiveEmb = new Discord.MessageEmbed()
                 .setColor('#42f5ce')
                 .setTitle('No one has reacted :frowning:')
-                .setFooter('PoseidonBot / Smart Meeting Feature')
+                .setFooter('HermesBot / Smart Meeting Feature')
                 .setTimestamp()
             message.channel.send(noactiveEmb);
                 return peopleYes = [];
@@ -533,7 +533,7 @@ bot.on('message', message => {
                 .setColor('#32908F')
                 .setTitle('Poll with title "' + pollTitle + '" has been initialized')
                 .setDescription('To add elements to the poll, simply type one at a time below')
-                .setFooter('PoseidonBot / Poll Feature')
+                .setFooter('HermesBot / Poll Feature')
                 .setTimestamp()
             message.channel.send(pollEmb)
             
@@ -560,7 +560,7 @@ bot.on('message', message => {
                                     .setColor('#32908F')
                                     .setTitle('Poll "' + pollTitle + '"')
                                     .setDescription(showOptions)
-                                    .setFooter('PoseidonBot / Poll Feature')
+                                    .setFooter('HermesBot / Poll Feature')
                                     .setAuthor('Poll started by ' + message.member.user.tag, message.author.displayAvatarURL())
                                     .setTimestamp()
                                 message.channel.send(pollEmb).then(embedMessage => {
@@ -602,12 +602,12 @@ bot.on('message', message => {
                                     .setColor('#291127')
                                     .setTitle('Save with name "' + nameofSave + '"')
                                     .setDescription('Write below what you want to save!')
-                                    .setFooter('PoseidonBot / Save Feature')
+                                    .setFooter('HermesBot / Save Feature')
             const saveEmb2 = new Discord.MessageEmbed()
                                     .setColor('#291127')
                                     .setTitle('Saved successfully!')
                                     .setDescription('You can use !save to see all current saves!')
-                                    .setFooter('PoseidonBot / Save Feature')
+                                    .setFooter('HermesBot / Save Feature')
             const saveAlreadyExists = new Discord.MessageEmbed()
                                     .setColor('#DC143C')
                                     .setTitle('Error!')
@@ -645,7 +645,7 @@ bot.on('message', message => {
                     const noSaves = new Discord.MessageEmbed()
                     .setColor('#42f5ce')
                     .setTitle('There are no saves.')
-                    .setFooter('PoseidonBot / Save Feature')
+                    .setFooter('HermesBot / Save Feature')
                     .setTimestamp()
                 message.channel.send(noSaves);
                 }else{
@@ -653,7 +653,7 @@ bot.on('message', message => {
                     .setColor('#42f5ce')
                     .setTitle('All saves listed below:')
                     .setDescription(saveFiles)
-                    .setFooter('PoseidonBot / Save Feature')
+                    .setFooter('HermesBot / Save Feature')
                     .setTimestamp()
                 message.channel.send(viewSaves);
                 }
@@ -667,7 +667,7 @@ bot.on('message', message => {
                     const recallEmbed = new Discord.MessageEmbed()
                                         .setColor('#FFFF00')
                                         .setTitle('Successfully recalled file named "' + nameofSaveRecall + '"')
-                                        .setFooter('PoseidonBot / Recall Feature')
+                                        .setFooter('HermesBot / Recall Feature')
                     if(saveFiles.includes(nameofSaveRecall)){
                         fs.readFile('./Saves/' + nameofSaveRecall, 'utf8', (err, savedDataRecall) => {
                             if(err) throw err;
@@ -710,7 +710,7 @@ bot.on('message', message => {
                 const saveDeleteEmb = new Discord.MessageEmbed()
                                         .setColor('#8B0000')
                                         .setTitle('Successfully deleted file named "' + saveDeleteFile + '"')
-                                        .setFooter('PoseidonBot / Recall Feature')
+                                        .setFooter('HermesBot / Recall Feature')
                 if(!message.member.roles.cache.some(r => r.name === "Admin")) {
                     setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
                     return message.channel.send("You don't have permission to do that!");
