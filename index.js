@@ -43,7 +43,7 @@ function attachIsImage(msgAttach) {
 bot.on('ready', () =>{
     console.log('Im On');
     bot.user.setActivity('Team Greece!', { type: 'WATCHING' })
-    bot.channels.cache.get("706456626143428628").send(patchnotes)
+   // bot.channels.cache.get("706456626143428628").send(patchnotes)
     
 })
 
