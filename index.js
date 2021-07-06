@@ -2,12 +2,11 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 const BotToken = require("./token.json")
 const token = BotToken.token;
-const embed = require('rich-embed');
 const PREFIX = '!';
 const fs = require('fs')
 
 
-var version = "Version 0.6" // Update
+var version = "Version 1.0" // Update
 var activeReminders = []; 
 var reminder = [];
 var activeMeetings = [];
@@ -78,24 +77,17 @@ bot.on('message', message => {
             let originalMsgMiliseconds = 0;
             
 
-            function debugging() {
-                console.log("\n");
-                console.log("originalMsg : " + originalMsg);
-                console.log("remiderTime : " + reminderTime);
-                console.log("originalMsgPhrase : " + originalMsgPhrase);
-                console.log("originalMsgTime : " + originalMsgTime);
-                console.log("timeType : " + timeType);
-                console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
-                console.log("Active reminders are : " + activeReminders);
-                console.log("\n");
-               // bot.channels.cache.get("706144360353235049").send("originalMsg : " + originalMsg)
-               // bot.channels.cache.get("706144360353235049").send("remiderTime : " + reminderTime)
-               // bot.channels.cache.get("706144360353235049").send("originalMsgPhrase : " + originalMsgPhrase)
-               // bot.channels.cache.get("706144360353235049").send("originalMsgTime : " + originalMsgTime)
-               // bot.channels.cache.get("706144360353235049").send("timeType : " + timeType)
-               // bot.channels.cache.get("706144360353235049").send("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat)
-               // bot.channels.cache.get("706144360353235049").send("Active reminders are : " + activeReminders)
-            }
+            // function debugging() {
+            //     console.log("\n");
+            //     console.log("originalMsg : " + originalMsg);
+            //     console.log("remiderTime : " + reminderTime);
+            //     console.log("originalMsgPhrase : " + originalMsgPhrase);
+            //     console.log("originalMsgTime : " + originalMsgTime);
+            //     console.log("timeType : " + timeType);
+            //     console.log("A reminder has been set: " + originalMsgPhrase + ", alarms in " + originalMsgTime +" " + reminderTimeFormat);
+            //     console.log("Active reminders are : " + activeReminders);
+            //     console.log("\n");
+            // }
 
 
             // Based off the delimiter, sets the time
@@ -380,90 +372,34 @@ bot.on('message', message => {
             }
         
             // First Meeting Embed
-            const meetingEmbed1 = new Discord.MessageEmbed()
-                    .setColor('#00FF00')
-                    .setTitle('Meeting Set!')
-                    .setDescription('The **meeting** has been set correctly! I will now notify **everyone**! Meeting Name: **"' + meetingTheme + '"!**')
-                    .setFooter('Meeting set by ' + message.member.user.tag, message.author.displayAvatarURL())
-                    .setTimestamp()
-            message.channel.send(meetingEmbed1);
+            // const meetingEmbed1 = new Discord.MessageEmbed()
+            //         .setColor('#00FF00')
+            //         .setTitle('Meeting Set!')
+            //         .setDescription('The **meeting** has been set correctly! I will now notify **everyone**! Meeting Name: **"' + meetingTheme + '"!**')
+            //         .setFooter('Meeting set by ' + message.member.user.tag, message.author.displayAvatarURL())
+            //         .setTimestamp()
+            // message.channel.send(meetingEmbed1);
             meetingDebugging();
 
 
             // Notification-DM embed
+            let emojiMeeting = ["✅", "🤷‍♀️", "❌"]
             const notificationEmbedMeeting = new Discord.MessageEmbed()
                     .setColor('#92000A')
                     .setTitle('Alert! Meeting Set!')
-                    .setDescription('**' + meetingAuthor + ' **has arranged a general meeting with theme **"' + meetingTheme + '"**.')
+                    .setDescription('**' + meetingAuthor + ' **has arranged a meeting with theme **"' + meetingTheme + '"**.')
                     .setAuthor('Meeting set by ' + message.member.user.tag, message.author.displayAvatarURL())
                     .addFields(
                         {name: 'Meeting Day', value:  meetingDate.charAt(0).toUpperCase() + meetingDate.substring(1) + " 📅"},
                         {name: 'Meeting Time', value: meetingTime},
                     )
-                    .setFooter('Write "Yes", "Maybe" or "No" to show availability')
+                    .setFooter('React with ✅, 🤷‍♀️ or ❌ to show availability')
                     .setTimestamp()
-            message.channel.send(notificationEmbedMeeting);
-            const collector = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
-            collector.on('collect', message => {
-                if(message.content.toLowerCase() == "yes") {
-                    if(!peopleAll.includes('<@' + message.member.id + '>')){
-                        console.log(peopleAll)
-                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
-                        console.log('they said yes');
-                        let yesPerson = '<@' + message.member.id + '>';
-                        peopleYes.push(yesPerson);
-                        console.log(peopleYes);
-                       // bot.channels.cache.get("706144360353235049").send(peopleYes)
-                        message.channel.send(meetingYes)
-                        peopleAll = peopleYes.concat(peopleMaybe, peopleNo);
-                    }else{
-                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                        message.channel.send(meetingAlreadyAssigned);
-                        console.log(peopleAll);
-                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
-                        return;
-                    }
-                }else if (message.content.toLowerCase() == "maybe") {
-                    if(!peopleAll.includes('<@' + message.member.id + '>')){
-                        console.log(peopleAll)
-                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
-                        console.log('they said maybe');
-                        let maybePerson = '<@' + message.member.id + '>';
-                        peopleMaybe.push(maybePerson);
-                        console.log(peopleMaybe);
-                       // bot.channels.cache.get("706144360353235049").send(peopleMaybe)
-                        message.channel.send(meetingMaybe)
-                        peopleAll = peopleMaybe.concat(peopleYes, peopleNo);
-                    }else{
-                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                        message.channel.send(meetingAlreadyAssigned);
-                        console.log(peopleAll);
-                       // bot.channels.cache.get("706144360353235049").send(peo)
-                        return;
-                    }
-                }else if (message.content.toLowerCase() == "no") {
-                    if(!peopleAll.includes('<@' + message.member.id + '>')){
-                        console.log(peopleAll)
-                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
-                        console.log('they said no');
-                        let noPerson = '<@' + message.member.id + '>';
-                        peopleNo.push(noPerson);
-                        console.log(peopleNo);
-                       // bot.channels.cache.get("706144360353235049").send(peopleNo)
-                        message.channel.send(meetingNo)
-                        peopleAll = peopleNo.concat(peopleMaybe, peopleYes);
-                    }else{
-                        setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                        message.channel.send(meetingAlreadyAssigned);
-                        console.log(peopleAll);
-                       // bot.channels.cache.get("706144360353235049").send(peopleAll)
-                        return;
-                    }
+            message.channel.send(notificationEmbedMeeting).then(embedMessage => {
+                for(t=0;t < 3; t++) {
+                    embedMessage.react(emojiMeeting[t])
                 }
-            });
-                
-
-        
+            })
         } catch (error) {
             const meetingErrorEmbed = new Discord.MessageEmbed()
             .setColor('#DC143C')
@@ -476,45 +412,6 @@ bot.on('message', message => {
         }
 
         break;
-        case 'meetingV':
-            if(!message.member.roles.cache.some(r => r.name === "Admin")) {
-                setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                return message.channel.send("You don't have permission to do that!");
-            }
-            // Embeds
-            const YesEmb = new Discord.MessageEmbed()
-                    .setColor('#00FF00')
-                    .setTitle('Reacted with :white_check_mark:!')
-                    .setDescription(peopleYes.toString())
-                    .setFooter('HermesBot / Smart Meeting Feature')
-                    .setTimestamp()
-            const MaybeEmb = new Discord.MessageEmbed()
-                    .setColor('#DC143C')
-                    .setTitle('Reacted with :woman_shrugging:!')
-                    .setDescription(peopleMaybe.toString())
-                    .setFooter('HermesBot / Smart Meeting Feature')
-                    .setTimestamp()
-            const NoEmb = new Discord.MessageEmbed()
-                    .setColor('#D95417')
-                    .setTitle('Reacted with :x:!')
-                    .setDescription(peopleNo.toString())
-                    .setFooter('HermesBot / Smart Meeting Feature')
-                    .setTimestamp()
-            
-            if (!isNaN(peopleYes) && !isNaN(peopleMaybe) && !isNaN(peopleNo)) {
-                const noactiveEmb = new Discord.MessageEmbed()
-                .setColor('#42f5ce')
-                .setTitle('No one has reacted :frowning:')
-                .setFooter('HermesBot / Smart Meeting Feature')
-                .setTimestamp()
-            message.channel.send(noactiveEmb);
-                return peopleYes = [];
-            }
-            if(isNaN(peopleYes)) message.channel.send(YesEmb)
-            if(isNaN(peopleMaybe)) message.channel.send(MaybeEmb)
-            if(isNaN(peopleNo)) message.channel.send(NoEmb)
-        break;
-
         case 'poll' :
             let pollTitle = message.content.toString().replace("!poll", '').substring(1);
             let options = [];
@@ -591,160 +488,148 @@ bot.on('message', message => {
 
                
         break;   
-        case 'save':
-            message.channel.bulkDelete(1);
-            let cancelSave = true;
-            let nameofSave = message.content.toString().replace(args[0], '').substring(2);
-            var saveFiles = fs.readdirSync('./Saves');
-            // console.log(nameofSave);
-            const saveObject = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
-            const saveEmb = new Discord.MessageEmbed()
-                                    .setColor('#291127')
-                                    .setTitle('Save with name "' + nameofSave + '"')
-                                    .setDescription('Write below what you want to save!')
-                                    .setFooter('HermesBot / Save Feature')
-            const saveEmb2 = new Discord.MessageEmbed()
-                                    .setColor('#291127')
-                                    .setTitle('Saved successfully!')
-                                    .setDescription('You can use !save to see all current saves!')
-                                    .setFooter('HermesBot / Save Feature')
-            const saveAlreadyExists = new Discord.MessageEmbed()
-                                    .setColor('#DC143C')
-                                    .setTitle('Error!')
-                                    .setDescription('Save exists! Please try a different name!')
-                                    .setFooter(':/')
+        // case 'save':
+        //     message.channel.bulkDelete(1);
+        //     let cancelSave = true;
+        //     let nameofSave = message.content.toString().replace(args[0], '').substring(2);
+        //     var saveFiles = fs.readdirSync('./Saves');
+        //     // console.log(nameofSave);
+        //     const saveObject = new Discord.MessageCollector(message.channel, m => m.channel.id === message.channel.id);
+        //     const saveEmb = new Discord.MessageEmbed()
+        //                             .setColor('#291127')
+        //                             .setTitle('Save with name "' + nameofSave + '"')
+        //                             .setDescription('Write below what you want to save!')
+        //                             .setFooter('HermesBot / Save Feature')
+        //     const saveEmb2 = new Discord.MessageEmbed()
+        //                             .setColor('#291127')
+        //                             .setTitle('Saved successfully!')
+        //                             .setDescription('You can use !save to see all current saves!')
+        //                             .setFooter('HermesBot / Save Feature')
+        //     const saveAlreadyExists = new Discord.MessageEmbed()
+        //                             .setColor('#DC143C')
+        //                             .setTitle('Error!')
+        //                             .setDescription('Save exists! Please try a different name!')
+        //                             .setFooter(':/')
 
-            if(args[1]){
-                if(!saveFiles.includes(nameofSave)){
-                    message.channel.send(saveEmb)
-                var saveFiles = fs.readdirSync('./Saves');
-                saveObject.on('collect', message => {
-                    if(!message.author.bot){
-                        if(cancelSave){
-                            if (!message.content.toString() == ''){
-                                let dataSave = message.content.toString().replace(args[0], '');
-                                fs.writeFile('./Saves/' + nameofSave, dataSave, { flag: 'w' }, (err) => {
-                                    if(err) throw err;
-                                    // console.log('saved')
-                                })
-                                message.channel.send(saveEmb2)
-                                setTimeout(function(){message.channel.bulkDelete(3)}, 4000)
-                                cancelSave = false;
-                                return;
-                                }
-                            }
-                        }
-                    });
-                }else{
-                    message.channel.send(saveAlreadyExists);
-                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
-                }
+        //     if(args[1]){
+        //         if(!saveFiles.includes(nameofSave)){
+        //             message.channel.send(saveEmb)
+        //         var saveFiles = fs.readdirSync('./Saves');
+        //         saveObject.on('collect', message => {
+        //             if(!message.author.bot){
+        //                 if(cancelSave){
+        //                     if (!message.content.toString() == ''){
+        //                         let dataSave = message.content.toString().replace(args[0], '');
+        //                         fs.writeFile('./Saves/' + nameofSave, dataSave, { flag: 'w' }, (err) => {
+        //                             if(err) throw err;
+        //                             // console.log('saved')
+        //                         })
+        //                         message.channel.send(saveEmb2)
+        //                         setTimeout(function(){message.channel.bulkDelete(3)}, 4000)
+        //                         cancelSave = false;
+        //                         return;
+        //                         }
+        //                     }
+        //                 }
+        //             });
+        //         }else{
+        //             message.channel.send(saveAlreadyExists);
+        //             setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+        //         }
                 
-            }else if(!args[1]){
-                if (!isNaN(saveFiles)) {
-                    const noSaves = new Discord.MessageEmbed()
-                    .setColor('#42f5ce')
-                    .setTitle('There are no saves.')
-                    .setFooter('HermesBot / Save Feature')
-                    .setTimestamp()
-                message.channel.send(noSaves);
-                }else{
-                    const viewSaves = new Discord.MessageEmbed()
-                    .setColor('#42f5ce')
-                    .setTitle('All saves listed below:')
-                    .setDescription(saveFiles)
-                    .setFooter('HermesBot / Save Feature')
-                    .setTimestamp()
-                message.channel.send(viewSaves);
-                }
-            }
-            break;
-            case 'recall':
-                try{
-                    message.channel.bulkDelete(1);
-                    var saveFiles = fs.readdirSync('./Saves');
-                    let nameofSaveRecall = message.content.toString().replace(args[0], '').substring(2);
-                    const recallEmbed = new Discord.MessageEmbed()
-                                        .setColor('#FFFF00')
-                                        .setTitle('Successfully recalled file named "' + nameofSaveRecall + '"')
-                                        .setFooter('HermesBot / Recall Feature')
-                    if(saveFiles.includes(nameofSaveRecall)){
-                        fs.readFile('./Saves/' + nameofSaveRecall, 'utf8', (err, savedDataRecall) => {
-                            if(err) throw err;
-                            message.channel.send(recallEmbed)
-                            message.channel.send('```' + savedDataRecall + '```')
-                            console.log(nameofSaveRecall)
-                        })
-                    }else{
-                    const recallError = new Discord.MessageEmbed()
-                        .setColor('#DC143C')
-                        .setTitle('Error!')
-                        .setDescription('Unknown error | Make sure you entered a valid file name!')
-                        .setFooter(':/')
-                        .setTimestamp()
-                    message.channel.send(recallError);
-                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+        //     }else if(!args[1]){
+        //         if (!isNaN(saveFiles)) {
+        //             const noSaves = new Discord.MessageEmbed()
+        //             .setColor('#42f5ce')
+        //             .setTitle('There are no saves.')
+        //             .setFooter('HermesBot / Save Feature')
+        //             .setTimestamp()
+        //         message.channel.send(noSaves);
+        //         }else{
+        //             const viewSaves = new Discord.MessageEmbed()
+        //             .setColor('#42f5ce')
+        //             .setTitle('All saves listed below:')
+        //             .setDescription(saveFiles)
+        //             .setFooter('HermesBot / Save Feature')
+        //             .setTimestamp()
+        //         message.channel.send(viewSaves);
+        //         }
+        //     }
+        //     break;
+        //     case 'recall':
+        //         try{
+        //             message.channel.bulkDelete(1);
+        //             var saveFiles = fs.readdirSync('./Saves');
+        //             let nameofSaveRecall = message.content.toString().replace(args[0], '').substring(2);
+        //             const recallEmbed = new Discord.MessageEmbed()
+        //                                 .setColor('#FFFF00')
+        //                                 .setTitle('Successfully recalled file named "' + nameofSaveRecall + '"')
+        //                                 .setFooter('HermesBot / Recall Feature')
+        //             if(saveFiles.includes(nameofSaveRecall)){
+        //                 fs.readFile('./Saves/' + nameofSaveRecall, 'utf8', (err, savedDataRecall) => {
+        //                     if(err) throw err;
+        //                     message.channel.send(recallEmbed)
+        //                     message.channel.send('```' + savedDataRecall + '```')
+        //                     console.log(nameofSaveRecall)
+        //                 })
+        //             }else{
+        //             const recallError = new Discord.MessageEmbed()
+        //                 .setColor('#DC143C')
+        //                 .setTitle('Error!')
+        //                 .setDescription('Unknown error | Make sure you entered a valid file name!')
+        //                 .setFooter(':/')
+        //                 .setTimestamp()
+        //             message.channel.send(recallError);
+        //             setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
 
-                    }
+        //             }
                     
                     
-                } catch (error) {
-                    const recallError = new Discord.MessageEmbed()
-                        .setColor('#DC143C')
-                        .setTitle('Error!')
-                        .setDescription('Unknown error | Make sure you entered a valid file name!')
-                        .setFooter(':/')
-                        .setTimestamp()
-                    message.channel.send(recallError);
-                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
-                }
+        //         } catch (error) {
+        //             const recallError = new Discord.MessageEmbed()
+        //                 .setColor('#DC143C')
+        //                 .setTitle('Error!')
+        //                 .setDescription('Unknown error | Make sure you entered a valid file name!')
+        //                 .setFooter(':/')
+        //                 .setTimestamp()
+        //             message.channel.send(recallError);
+        //             setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+        //         }
                 
                 
 
 
 
+        //     break;
+        //     case 'saveDelete':
+        //         var saveFiles = fs.readdirSync('./Saves');
+        //         let saveDeleteFile = message.content.toString().replace('!saveDelete ', '')
+        //         const saveDeleteEmb = new Discord.MessageEmbed()
+        //                                 .setColor('#8B0000')
+        //                                 .setTitle('Successfully deleted file named "' + saveDeleteFile + '"')
+        //                                 .setFooter('HermesBot / Recall Feature')
+        //         if(!message.member.roles.cache.some(r => r.name === "Admin")) {
+        //             setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
+        //             return message.channel.send("You don't have permission to do that!");
+        //         }
+        //         if(saveFiles.includes(saveDeleteFile)){
+        //             message.channel.bulkDelete(1)
+        //             fs.unlink('./Saves/' + saveDeleteFile, (err) => {
+        //                 if(err) throw err;
+        //                 message.channel.send(saveDeleteEmb)
+        //             })
+        //         }else{
+        //             message.channel.bulkDelete(1)
+        //             const saveDeleteEmb = new Discord.MessageEmbed()
+        //                 .setColor('#DC143C')
+        //                 .setTitle('Error!')
+        //                 .setDescription('Unknown error | Make sure you entered a valid file name!')
+        //                 .setFooter(':/')
+        //                 .setTimestamp()
+        //             message.channel.send(saveDeleteEmb);
+        //             setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
+        //         }
             break;
-            case 'saveDelete':
-                var saveFiles = fs.readdirSync('./Saves');
-                let saveDeleteFile = message.content.toString().replace('!saveDelete ', '')
-                const saveDeleteEmb = new Discord.MessageEmbed()
-                                        .setColor('#8B0000')
-                                        .setTitle('Successfully deleted file named "' + saveDeleteFile + '"')
-                                        .setFooter('HermesBot / Recall Feature')
-                if(!message.member.roles.cache.some(r => r.name === "Admin")) {
-                    setTimeout(function(){ message.channel.bulkDelete(2) }, 5000)
-                    return message.channel.send("You don't have permission to do that!");
-                }
-                if(saveFiles.includes(saveDeleteFile)){
-                    message.channel.bulkDelete(1)
-                    fs.unlink('./Saves/' + saveDeleteFile, (err) => {
-                        if(err) throw err;
-                        message.channel.send(saveDeleteEmb)
-                    })
-                }else{
-                    message.channel.bulkDelete(1)
-                    const saveDeleteEmb = new Discord.MessageEmbed()
-                        .setColor('#DC143C')
-                        .setTitle('Error!')
-                        .setDescription('Unknown error | Make sure you entered a valid file name!')
-                        .setFooter(':/')
-                        .setTimestamp()
-                    message.channel.send(saveDeleteEmb);
-                    setTimeout(function(){ message.channel.bulkDelete(1) }, 5000)
-                }
-                
-
-
-
-            break;
-
-
-
-
-
-
-
-
         }
 });
 
