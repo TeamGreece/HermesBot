@@ -1,0 +1,56 @@
+{
+    "meeting": {
+        "properties":{
+            "name": "meeting",
+            "description": "Manage meetings",
+            "options": [
+                {
+                    "name": "set",
+                    "description": "Arrange a meeting",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "meeting_name",
+                            "description": "What will the meeting be called?",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "day",
+                            "description": "Define the day of the meeting",
+                            "type": 3,
+                            "required": true,
+                            "choices": [
+                                {"name": "Monday", "value": "monday"},
+                                {"name": "Tuesday", "value": "tuesday"},
+                                {"name": "Wednesday", "value": "wednesday"},
+                                {"name": "Thursday", "value": "thursday"},
+                                {"name": "Friday", "value": "friday"},
+                                {"name": "Saturday", "value": "saturday"},
+                                {"name": "Sunday", "value": "sunday"}
+                            ]
+                        },
+                        {
+                            "name": "time",
+                            "description": "Define the time of the meeting",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "notify",
+                            "description": "Should I notifiy everyone?",
+                            "type": 5,
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "view",
+                    "description": "Check the availability on the meetings you arranged",
+                    "type": 1,
+                    "options": []
+                }
+            ]
+        }  
+    }
+}

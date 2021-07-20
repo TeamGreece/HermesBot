@@ -1,16 +1,25 @@
 {
-  "name": "teamgreece",
-  "version": "0.2.0",
+  "name": "HermesBotAPI",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Programming Department of TeamGreece",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamGreece/HermesBotAPI.git"
+  },
+  "keywords": [],
+  "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TeamGreece/HermesBotAPI/issues"
+  },
+  "homepage": "https://github.com/TeamGreece/HermesBotAPI#readme",
   "dependencies": {
-    "discord.js": "^12.1.1",
-    "fs": "0.0.1-security",
-    "ms": "^2.1.2"
+    "discord-buttons": "^4.0.0",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0"
   }
 }
