@@ -3,6 +3,7 @@ const buttons = require('discord-buttons')
 const commandsList = require('./commands.json')
 require('dotenv').config()
 const https = require('https')
+const { match } = require('assert')
 
 const client = new DiscordJs.Client()
 buttons(client)
@@ -214,16 +215,92 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
             break
           
           case 'view':
-            const meetingView = new DiscordJs.MessageEmbed()
-              .setColor('#92000A')
-              .setTitle('Meeting Availability')
-              .setDescription('**' + 'meetingAuthor' + ' **has arranged a general meeting with theme **"' + 'meetingTheme' + '"**.')
-              .setAuthor('Meeting set by ' + 'meetingAuthoruserAvatar')
-              .setFooter('Click "Yes", "Maybe" or "No" to show availability')
-              .setTimestamp()
-
-            reply(interaction, '', meetingView)
-        }
+            let argumentsView = {}
+            if (options){
+              for (const option of options){
+                  const { name, value } = option
+                  argumentsView[name] = value
+              }
+            }
+            let meetingCounter = 0;
+            const meetingViewNone = new DiscordJs.MessageEmbed()
+              .setColor('#FF0000')
+              .setTitle('No Meeting Found :(')
+              .setDescription("We couldn't find a meeting that you have arranged :/")
+              .setFooter(":/")
+            const meetingviewAuthor = interaction.member.user.id
+            for(i in activeMeetings){
+              let meetingId = activeMeetings[i]['author']['id']
+              if(meetingId == meetingviewAuthor){
+                meetingCounter += 1;
+                let meetingNameView = activeMeetings[i]['arguments']['theme'] || 'undefined'
+                let meetingDayView = activeMeetings[i]['arguments']['day'] || 'undefined'
+                let meetingTimeView = activeMeetings[i]['arguments']['time'] || 'undefined'
+                let meetingYesView = activeMeetings[i]['yesPeople']
+                let meetingMaybeView = activeMeetings[i]['maybePeople']
+                let meetingNoView = activeMeetings[i]['noPeople']
+                let meetingYesArrayView = []
+                let meetingMaybeArrayView = []
+                let meetingNoArrayView = []
+                for(y in meetingYesView){
+                  console.log("yes")
+                  console.log(y)
+                  console.log(activeMeetings)
+                  meetingYesArrayView.push(activeMeetings[0]['yesPeople'][y]['username'])
+                }
+                for(m in meetingMaybeView){
+                  console.log("maybe")
+                  meetingMaybeArrayView.push(activeMeetings[0]['maybePeople'][m]['username'])
+                }
+                for(n in meetingNoView){
+                  console.log("no")
+                  meetingNoArrayView.push(activeMeetings[0]['noPeople'][n]['username'])
+                }
+                meetingYesView = meetingYesArrayView.toString().replace(",", ", ")
+                meetingMaybeView = meetingMaybeArrayView.toString().replace(",", ", ")
+                meetingNoView = meetingNoArrayView.toString().replace(",", ", ")
+                console.log(meetingYesView)
+                console.log(meetingMaybeView)
+                console.log(meetingNoView)
+                var meetingView = new DiscordJs.MessageEmbed()
+                .setColor('#00EE00')
+                .setTitle('Meeting Found!')
+                .setDescription('We found a meeting that you have arranged!')
+                .addFields(
+                  {name: 'Meeting Name', value: meetingNameView},
+                  {name: 'Meeting Day', value: meetingDayView},
+                  {name: 'Meeting Time', value: meetingTimeView},
+                  {name: 'Reacted with: YES', value: meetingYesView || "-"},
+                  {name: 'Reacted with: MAYBE', value: meetingMaybeView || "-"},
+                  {name: 'Reacted with: NO', value: meetingNoView || "-"},
+                )
+                var meetingViewMore = new DiscordJs.MessageEmbed()
+                  .setColor('#0000FF')
+                  .setTitle('Multiple Meetings Found!')
+                  .setDescription("We found **" + meetingCounter + "** meetings that you have organised. To see them, please add the according number to the command(e.g. /meeting view int:1)")
+                if(!isNaN(argumentsView['int'])){
+                  console.log("we have args")
+                  if(argumentsView['int'] == meetingCounter){
+                    // console.log('TheBoi' + meetingCounter)
+                    reply(interaction, 'Correct input', meetingView)
+                  }
+                }
+              }
+            }
+            if(meetingCounter == 1 && Object.keys(argumentsView).length === 0 && argumentsView.constructor === Object){ // Second condition checks if object argumentsview is empty
+              console.log("just 1 meeting")
+              reply(interaction, '', meetingView)
+            }else if(meetingCounter == 0){
+              console.log("none meetings")
+              reply(interaction, '', meetingViewNone)
+            }else if(argumentsView['int'] > meetingCounter || argumentsView['int'] <= 0){
+              reply(interaction, '', meetingViewNone)
+            }
+            else if(meetingCounter > 1){
+              console.log("several meeting")
+              reply(interaction, '', meetingViewMore)
+            }
+          }
         }
         
   }

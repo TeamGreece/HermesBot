@@ -48,7 +48,14 @@
                     "name": "view",
                     "description": "Check the availability on the meetings you arranged",
                     "type": 1,
-                    "options": []
+                    "options": [
+                        {
+                            "name": "int",
+                            "description": "Which meeting do you want to access?",
+                            "type": 4,
+                            "required": false
+                        }
+                    ]
                 }
             ]
         }  
