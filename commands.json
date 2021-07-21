@@ -10,7 +10,7 @@
                     "type": 1,
                     "options": [
                         {
-                            "name": "meeting_name",
+                            "name": "theme",
                             "description": "What will the meeting be called?",
                             "type": 3,
                             "required": true
@@ -31,10 +31,48 @@
                             ]
                         },
                         {
-                            "name": "time",
+                            "name": "hour",
                             "description": "Define the time of the meeting",
                             "type": 3,
-                            "required": true
+                            "required": true,
+                            "choices": [
+                                {"name": "00", "value": "00"},
+                                {"name": "01", "value": "01"},
+                                {"name": "02", "value": "02"},
+                                {"name": "03", "value": "03"},
+                                {"name": "04", "value": "04"},
+                                {"name": "05", "value": "05"},
+                                {"name": "06", "value": "06"},
+                                {"name": "07", "value": "07"},
+                                {"name": "08", "value": "08"},
+                                {"name": "09", "value": "09"},
+                                {"name": "10", "value": "10"},
+                                {"name": "11", "value": "11"},
+                                {"name": "12", "value": "12"},
+                                {"name": "13", "value": "13"},
+                                {"name": "14", "value": "14"},
+                                {"name": "15", "value": "15"},
+                                {"name": "16", "value": "16"},
+                                {"name": "17", "value": "17"},
+                                {"name": "18", "value": "18"},
+                                {"name": "19", "value": "19"},
+                                {"name": "20", "value": "20"},
+                                {"name": "21", "value": "21"},
+                                {"name": "22", "value": "22"},
+                                {"name": "23", "value": "23"}
+                            ]
+                        },
+                        {
+                            "name": "minute",
+                            "description": "Define the time of the meeting",
+                            "type": 3,
+                            "required": true,
+                            "choices": [
+                                {"name": "00", "value": "00"},
+                                {"name": "15", "value": "15"},
+                                {"name": "30", "value": "30"},
+                                {"name": "45", "value": "45"}
+                            ]
                         },
                         {
                             "name": "notify",
