@@ -16,19 +16,36 @@
                             "required": true
                         },
                         {
-                            "name": "day",
-                            "description": "Define the day of the meeting",
+                            "name": "date",
+                            "description": "Define the date of the meeting",
+                            "type": 4,
+                            "required": true
+                        },
+                        {
+                            "name": "month",
+                            "description": "Define the month of the meeting",
                             "type": 3,
                             "required": true,
                             "choices": [
-                                {"name": "Monday", "value": "monday"},
-                                {"name": "Tuesday", "value": "tuesday"},
-                                {"name": "Wednesday", "value": "wednesday"},
-                                {"name": "Thursday", "value": "thursday"},
-                                {"name": "Friday", "value": "friday"},
-                                {"name": "Saturday", "value": "saturday"},
-                                {"name": "Sunday", "value": "sunday"}
+                                {"name": "January", "value": "01"},
+                                {"name": "February", "value": "02"},
+                                {"name": "March", "value": "03"},
+                                {"name": "April", "value": "04"},
+                                {"name": "May", "value": "05"},
+                                {"name": "June", "value": "06"},
+                                {"name": "July", "value": "07"},
+                                {"name": "August", "value": "08"},
+                                {"name": "Semptember", "value": "09"},
+                                {"name": "October", "value": "10"},
+                                {"name": "November", "value": "11"},
+                                {"name": "December", "value": "12"}
                             ]
+                        },
+                        {
+                            "name": "year",
+                            "description": "Define the year of the meeting",
+                            "type": 4,
+                            "required": true
                         },
                         {
                             "name": "hour",
@@ -76,9 +93,19 @@
                         },
                         {
                             "name": "notify",
-                            "description": "Should I notifiy everyone?",
-                            "type": 5,
-                            "required": false
+                            "description": "Who should I notify?",
+                            "type": 3,
+                            "required": true,
+                            "choices": [
+                                {"name": "Everyone", "value": "everyone"},
+                                {"name": "CAD", "value": "cad"},
+                                {"name": "Social Media", "value": "social"},
+                                {"name": "Website", "value": "website"},
+                                {"name": "Creative", "value": "creative"},
+                                {"name": "Community Outreach", "value": "community"},
+                                {"name": "Fundraising", "value": "fundraising"},
+                                {"name": "Moderation", "value": "mods"}
+                            ]
                         }
                     ]
                 },

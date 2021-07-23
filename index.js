@@ -43,6 +43,9 @@ client.on('ready', async () => {
 })
 
 var activeMeetings = []
+setInterval(function(){
+  console.log(activeMeetings)
+}, 5000)
 
 client.ws.on('INTERACTION_CREATE', async (interaction) => {
   if (interaction.type === 3){
@@ -146,13 +149,88 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
                   arguments[name] = value
               }
             }
-
+            const meetingChannel = client.channels.cache.get(interaction.channel_id)
             const meetingAuthor = interaction.member.user.username
             const meetingTheme = arguments['theme']
-            const meetingDay = arguments['day']
+            const meetingDate = arguments['date']
+            const meetingMonth = arguments['month']
+            const meetingYear = arguments['year']
             const meetingHour = arguments['hour']
             const meetingMin = arguments['minute']
-            // const meetingTime = arguments['time']
+            const meetingNotifees = arguments['notify']
+
+            let notifees;
+            if(arguments['notify']){
+              switch(arguments['notify']){
+                case 'everyone':
+                  notifees = "@everyone"
+                  break;
+                case 'cad':
+                  notifees = "<@&865253589893906432>"
+                  break;
+                case 'social':
+                  notifees = "<@&865253589893906432>"
+                  break;
+                case 'website':
+                  notifees = "<@&865253589893906432>"
+                  break;
+                case 'creative':
+                  notifees = "<@&865255215812706324>"
+                  break;
+                case 'fundraising':
+                  notifees = "<@&865255215812706324>"
+                  break;
+                case 'community':
+                  notifees = "<@&865255215812706324>"
+                  break;
+                case 'mods':
+                  notifees = "<@&865253589893906432>"
+                  break;
+              }
+            }
+
+            if(meetingDate.toString().length > 2 || meetingDate > 31){
+              reply(interaction, 'error')
+              return;
+            }
+            if(meetingYear.toString().length > 4){
+              reply(interaction, 'error')
+              return;
+            }
+            let messageTime = Date.parse(meetingYear + "-" + meetingMonth + "-" + meetingDate + " " + meetingHour + ":" + meetingMin + ":00+00:00")
+            let currentTime = new Date();
+            let currentTimeMs = Date.parse(currentTime)
+            var n = currentTime.getTimezoneOffset()
+            n = n * 60000
+            currentTimeMs -= n
+
+            if(messageTime < currentTimeMs){
+              reply(interaction, 'Invalid Time Input')
+              return;
+            }
+
+            let timeDifference = messageTime - currentTimeMs;
+            timeDifference -= 300000
+            if(timeDifference < 0){
+              timeDifference = 500
+            }
+            if(timeDifference > 604800000){
+              reply(interaction, 'You cant set a meeting for that long!')
+              return;
+            }
+            const meetingNow = new DiscordJs.MessageEmbed()
+                .setColor('#102542')
+                .setTitle('Meeting Alert!')
+                .setDescription('Meeting with theme: **' + meetingTheme + '** by **' + meetingAuthor + '** starts in __**5 Minutes**__!\n\nMeeting regards: ' + notifees)
+            setTimeout(function(){
+              meetingChannel.send(notifees)
+              meetingChannel.send(meetingNow)
+            }, timeDifference)
+            // setTimeout(function(){
+            //   activeMeetings = activeMeetings.filter(p => p.id !== person.id)
+            // }, 15000)
+            console.log(activeMeetings.indexOf(meeting))
+            // console.log(activeMeetings = meeting.yesPeople.filter(p => p.id !== person.id))
             const meetingId = interaction.id
 
             var meeting = {
@@ -167,19 +245,20 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
               arguments: {
                 theme: meetingTheme,
                 time: meetingHour + ":" + meetingMin,
-                day: meetingDay
+                day: meetingDate + "/" + meetingMonth + "/" + meetingYear
               },
               yesPeople:[],
               noPeople:[],
               maybePeople:[],
             }
+            console.log(meeting)
 
             const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`
 
             const notificationEmbedMeeting = new DiscordJs.MessageEmbed()
                                             .setColor('#FF7F11')
                                             .setTitle('Hey Team Greece! New Meeting organized by **' + meetingAuthor + "!**")
-                                            .setDescription('The meeting with theme **"' + meetingTheme + '"** will occur this **' + meetingDay + "** at **" + meetingHour + ":" + meetingMin + "!**\n\nPlease use the corresponding button below to show **if you will be able to attend!**")
+                                            .setDescription('The meeting with theme **"' + meetingTheme + '"** will occur on **' + meetingDate + "/" + meetingMonth + "/" + meetingYear + "** at **" + meetingHour + ":" + meetingMin + "!**\n\nPlease use the corresponding button below to show **if you will be able to attend!**")
                                             .setAuthor('Meeting organized by ' + meetingAuthor + '!', userAvatar)
             
             const yesButton = new buttons.MessageButton()
@@ -195,9 +274,9 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
                               .setLabel('Maybe')
                               .setStyle('blurple')
             const availabilityRow = new buttons.MessageActionRow().addComponents(yesButton, maybeButton, noButton)
-
+            
             if (arguments['notify']){
-              reply(interaction, '@everyone', notificationEmbedMeeting, availabilityRow)
+              reply(interaction, notifees, notificationEmbedMeeting, availabilityRow)
             }else{
               reply(interaction, '', notificationEmbedMeeting, availabilityRow)
             }
@@ -251,7 +330,7 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
                 // .setDescription('We found a meeting that you have arranged!')
                 .addFields(
                   {name: 'Meeting Name', value: meetingNameView},
-                  {name: 'Meeting Day', value: meetingDayView},
+                  {name: 'Meeting Date', value: meetingDayView},
                   {name: 'Meeting Time', value: meetingTimeView},
                   {name: 'Reacted with: YES', value: meetingYesView || "-"},
                   {name: 'Reacted with: MAYBE', value: meetingMaybeView || "-"},
@@ -284,91 +363,6 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
   }
   
 })
-
-reminderMeeting("thursday", "00", "01")
-
-function reminderMeeting(day, hour, minute){
-  let dayNum;
-  let dayNumNow;
-  let dayDiff;
-  const d = new Date();
-  switch(day.toLowerCase()){
-    case 'monday':
-      dayNum = 1;
-      break;
-    case 'tuesday':
-      dayNum = 2;
-      break;
-    case 'wednesday':
-      dayNum = 3;
-      break;
-    case 'thursday':
-      dayNum = 4;
-      break;
-    case 'friday':
-      dayNum = 5;
-      break;
-    case 'saturday':
-      dayNum = 6;
-      break;
-    case 'sunday':
-      dayNum = 7;
-      break;
-  }
-  switch(d.getDay()){
-    case 1:
-      dayNumNow = 1;
-      break;
-    case 2:
-      dayNumNow = 2;
-      break;
-    case 3:
-      dayNumNow = 3;
-      break;
-    case 4:
-      dayNumNow = 4;
-      break;
-    case 5:
-      dayNumNow = 5;
-      break;
-    case 6:
-      dayNumNow = 6;
-      break;
-    case 0:
-      dayNumNow = 7;
-      break;
-  }
-  console.log("Day Num From Switch: " + dayNum)
-  console.log("Day Num From JS: " + d.getDay())
-
-  // console.log("Hour From Array: " + hour)
-  // console.log("Hour From JS: " + d.getHours())
-
-  // console.log("Minute From Array: " + minute)
-  // console.log("Minute From JS: " + d.getMinutes())
-
-  // console.log("Time from array: " + hour + minute)
-  // console.log("Actual Time: " + d.getHours() + d.getMinutes())
-
-  let hourDiff = Math.abs(hour - d.getHours())
-  let minDiff = Math.abs(minute - d.getMinutes())
-  if(dayNum > dayNumNow){
-    console.log('case1')
-    dayDiff = dayNum - dayNumNow
-  }else if(dayNum < dayNumNow){
-    console.log('case2')
-    dayDiff = 7 - (dayNumNow - dayNum)
-  }else{
-    console.log('case3')
-    dayDiff = 0
-  }
-  dayDiff -= 1
-  // console.log(hourDiff)
-  // console.log(minDiff)
-  // console.log(dayDiff)
-  hourDiff = hourDiff + dayDiff * 24
-  console.log(hourDiff)
-}
 
 const reply = async (interaction, content, embeds=[], components=[]) => {
 
