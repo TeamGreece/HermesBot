@@ -43,9 +43,9 @@ client.on('ready', async () => {
 })
 
 var activeMeetings = []
-setInterval(function(){
-  console.log(activeMeetings)
-}, 5000)
+// setInterval(function(){
+//   console.log(activeMeetings)
+// }, 5000)
 
 client.ws.on('INTERACTION_CREATE', async (interaction) => {
   if (interaction.type === 3){
@@ -226,9 +226,9 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
               meetingChannel.send(notifees)
               meetingChannel.send(meetingNow)
             }, timeDifference)
-            // setTimeout(function(){
-            //   activeMeetings = activeMeetings.filter(p => p.id !== person.id)
-            // }, 15000)
+            setTimeout(function(){
+              activeMeetings = activeMeetings.filter(m => m.id !== interaction.id)
+            }, timeDifference)// + 300000)
             console.log(activeMeetings.indexOf(meeting))
             // console.log(activeMeetings = meeting.yesPeople.filter(p => p.id !== person.id))
             const meetingId = interaction.id
@@ -300,6 +300,7 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
               .setFooter(":/")
             const meetingviewAuthor = interaction.member.user.id
             for(i in activeMeetings){
+              console.log(i)
               let meetingId = activeMeetings[i]['author']['id']
               if(meetingId == meetingviewAuthor){
                 meetingCounter += 1;
@@ -325,7 +326,7 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
                 meetingMaybeView = meetingMaybeArrayView.toString().replace(",", ", ")
                 meetingNoView = meetingNoArrayView.toString().replace(",", ", ")
                 var meetingView = new DiscordJs.MessageEmbed()
-                .setColor('#00EE00')
+                .setColor('##51d437')
                 .setTitle('Meeting Found!')
                 // .setDescription('We found a meeting that you have arranged!')
                 .addFields(
@@ -337,10 +338,17 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
                   {name: 'Reacted with: NO', value: meetingNoView || "-"},
                 )
                 var meetingViewMore = new DiscordJs.MessageEmbed()
-                  .setColor('#0000FF')
+                  .setColor('##3769d4')
                   .setTitle('Multiple Meetings Found!')
                   .setDescription("We found **" + meetingCounter + "** meetings that you have organised. To see them, please add the according number to the command(e.g. /meeting view int:1)")
-                if(!isNaN(argumentsView['int'])){
+                  for(const m of activeMeetings){
+                    if(m.author.id === meetingviewAuthor){
+                      meetingViewMore.addField(
+                        `${activeMeetings.indexOf(m) + 1})`, m.arguments.theme, true
+                      )
+                    }
+                  }
+                 if(!isNaN(argumentsView['int'])){
                   if(argumentsView['int'] == meetingCounter){
                     reply(interaction, '', meetingView)
                   }
@@ -390,6 +398,17 @@ const createAPIMessage = async (interaction, content, embeds, components) => {
 
 client.on('message', message =>{
   if (message.author.bot) return;
+  
+  var Attachment = (message.attachments).array();
+  if (message.attachments.size > 0) {
+      message.channel.send('A copy of the file sent by ' + message.member.user.tag + ' is now sent to #files!')
+      setTimeout(function(){message.channel.bulkDelete(1)}, 4000)
+      console.log("New Attachment")
+      // console.log(Attachment[0].url);
+      // bot.channels.cache.get('696005900863012866').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
+      client.channels.cache.get('711249792151453697').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
+      
+  }
 
 })
 
