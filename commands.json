@@ -124,5 +124,73 @@
                 }
             ]
         }  
+    },
+    "poll": {
+        "properties": {
+            "name": "poll",
+            "description": "Create a poll",
+            "options": [
+                {
+                    "name": "theme",
+                    "description": "The theme of the poll",
+                    "type": 3,
+                    "required": true
+                },
+                {
+                    "name": "option_1",
+                    "description": "The first option of the poll",
+                    "type": 3,
+                    "required": true
+                },
+                {
+                    "name": "option_2",
+                    "description": "The second option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_3",
+                    "description": "The third option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_4",
+                    "description": "The fourth option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_5",
+                    "description": "The fifth option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_6",
+                    "description": "The sixth option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_7",
+                    "description": "The seventh option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_8",
+                    "description": "The eighth option of the poll",
+                    "type": 3,
+                    "required": false
+                },
+                {
+                    "name": "option_9",
+                    "description": "The nineth option of the poll",
+                    "type": 3,
+                    "required": false
+                }
+            ]
+        }
     }
 }

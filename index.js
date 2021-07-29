@@ -14,7 +14,7 @@ const commandRegisterOptions = {
   hostname: 'discord.com',
   port: 443,
   path: `/api/v8/applications/705848696419516488/guilds/${guildId}/commands`,
-  method: 'POST',
+  method: 'PUT',
   headers: {
       'Authorization': `Bot ${process.env.TOKEN}`,
       'Content-Type': 'application/json'
@@ -35,7 +35,9 @@ client.on('ready', async () => {
     console.error(error)
   })
 
-  req.write(JSON.stringify(commandsList['meeting']['properties']))
+  let commands  = `[${JSON.stringify(commandsList['meeting']['properties'])}, ${JSON.stringify(commandsList['poll']['properties'])}]`
+  req.write(commands)
+  // req.write()
   
   req.end()
 
@@ -128,7 +130,7 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
     }
   }
   if (interaction.type === 2){  
-    const { name, options } = interaction.data
+    const { name } = interaction.data
     command = name.toLowerCase()
 
     console.log('\nCommand used: ' + command)
@@ -366,6 +368,36 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
               reply(interaction, '', meetingViewMore)
             }
           }
+          break
+          
+      case 'poll':
+        
+        let arguments = {options: []}
+        let pollOptions = interaction.data.options
+        if (pollOptions){
+          for (const option of pollOptions){
+            
+              const { name, value } = option
+              if (name.includes('option')){arguments.options.push(value)}
+              else {arguments[name] = value}
+          }
+        }
+        console.log(arguments)
+        const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`
+
+        let pollEmbed = new DiscordJs.MessageEmbed()
+          .setTitle(`New poll!`)
+          .setColor('#32908F')
+          .setFooter('HermesBot / Poll Feature')
+          .setAuthor('Poll started by ' + interaction.member.user.username, userAvatar)
+          .setTimestamp()
+        let description = ''
+        for(const i in arguments.options){
+          description += `${parseInt(i)+1}) ` + arguments.options[i] + '\n'
+        }
+        pollEmbed.setDescription(description)
+
+        reply(interaction, '', pollEmbed)
         }
         
   }
