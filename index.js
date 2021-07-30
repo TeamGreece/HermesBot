@@ -516,13 +516,29 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
         const pollAuthor = interaction.member.user.username;
         const pollTheme = argumentsPoll.theme;
 
-        for(const i of argumentsPoll.options){
-          for(const j in argumentsPoll.options){
-            if (i === argumentsPoll.options[parseInt(j)+1]){
-              reply(interaction, 'You can\'t have the same options!')
-              return
+        function findSameOptions(array) {
+          const count = {};
+
+          array.forEach((item) => {
+            if (count[item]) {
+              count[item] += 1;
+              return;
+            }
+            count[item] = 1;
+          });
+
+          for (let prop in count) {
+            if (count[prop] >= 2) {
+              return true;
             }
           }
+
+          console.log(count);
+          return false;
+        }
+
+        if(findSameOptions(argumentsPoll.options)){
+          reply(interaction, 'You can\'t have the same options')
         }
 
         var poll = {
