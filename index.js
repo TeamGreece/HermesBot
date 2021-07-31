@@ -3,7 +3,6 @@ const buttons = require("discord-buttons");
 const commandsList = require("./commands.json");
 require("dotenv").config();
 const https = require("https");
-const { match } = require("assert");
 
 const client = new DiscordJs.Client();
 buttons(client);
@@ -54,21 +53,22 @@ var activePolls = [];
 client.ws.on("INTERACTION_CREATE", async (interaction) => {
   if (interaction.type === 3) { //Handling components
     let componentType = interaction.data.component_type;
+    const username = interaction.member.user.username;
+    const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`;
+    const nickname = interaction.member.nick;
+    const id = interaction.member.user.id;
+    const discriminator = interaction.member.user.discriminator;
+
+    const person = {
+      username: username,
+      avatarUrl: userAvatar,
+      nickname: nickname,
+      id: id,
+      discriminator: discriminator,
+    };
     if (componentType === 2) { //Handling buttons
       let ids = interaction.data.custom_id.split("_");
-      const username = interaction.member.user.username;
-      const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`;
-      const nickname = interaction.member.nick;
-      const id = interaction.member.user.id;
-      const discriminator = interaction.member.user.discriminator;
-
-      const person = {
-        username: username,
-        avatarUrl: userAvatar,
-        nickname: nickname,
-        id: id,
-        discriminator: discriminator,
-      };
+      
       if (activeMeetings.find((meeting) => meeting.id === ids[1])) {
         const meeting = activeMeetings.find((meeting) => meeting.id === ids[1]);
 
@@ -150,16 +150,31 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
         }
       }
     }
+
     else if(componentType === 3){ //Handling Menus
       if(interaction.data.custom_id.includes('poll')){
+
         let ids = interaction.data.custom_id.split('_')
         if(activePolls.find(poll => poll.id === ids[1])){
           const poll = activePolls.find((poll) => poll.id === ids[1]);
+          const selectedOption = interaction.data.values[0]
+
+          for(const option in poll.responses){
+            let arr = poll.responses[option]
+            if(arr !== poll.responses[selectedOption]){
+              if(arr.filter(p => p.id === person.id)){
+                poll.responses[option] = arr.filter((p) => p.id !== person.id);
+              }
+            }
+          }
+          poll.responses[selectedOption].push(person)
+          console.log(poll)
+          console.log(poll.getTotalResponses())
 
           let pollResEmbed = new DiscordJs.MessageEmbed()
             .setColor("#7289DA")
             .setTitle("Poll " + poll.arguments.theme)
-            .setDescription(`<@${poll.author.id}> reacted with ${interaction.data.values[0]}`)
+            .setDescription(`<@${poll.author.id}> reacted with ${selectedOption}`)
             .setFooter("Poll Reaction", poll.author.avatar)
             .setTimestamp();
           reply(interaction, '', pollResEmbed)
@@ -497,100 +512,122 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
         break;
 
       case "poll":
-        let argumentsPoll = { options: [] };
-        let emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
-        let pollOptions = interaction.data.options;
-        if (pollOptions) {
-          for (const option of pollOptions) {
-            const { name, value } = option;
-            if (name.includes("option")) {
-              argumentsPoll.options.push(value);
-            } else {
-              argumentsPoll[name] = value;
+        const sub_name = interaction.data.options[0].name;
+        subcommand = sub_name.toLowerCase();
+
+        console.log("\nCommand used: " + subcommand);
+        switch (subcommand) {
+          case 'create':
+
+            let argumentsPoll = { options: [] };
+            let emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
+            let pollOptions = interaction.data.options[0].options;
+            if (pollOptions) {
+              for (const option of pollOptions) {
+                const { name, value } = option;
+                if (name.includes("option")) {
+                  argumentsPoll.options.push(value);
+                } else {
+                  argumentsPoll[name] = value;
+                }
+              }
             }
-          }
-        }
-        console.log(argumentsPoll);
-        const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`;
-        const pollId = interaction.id;
-        const pollAuthor = interaction.member.user.username;
-        const pollTheme = argumentsPoll.theme;
+            console.log(argumentsPoll);
+            const userAvatar = `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`;
+            const pollId = interaction.id;
+            const pollAuthor = interaction.member.user.username;
+            const pollTheme = argumentsPoll.theme;
 
-        function findSameOptions(array) {
-          const count = {};
+            function findSameOptions(array) {
+              const count = {};
 
-          array.forEach((item) => {
-            if (count[item]) {
-              count[item] += 1;
-              return;
+              array.forEach((item) => {
+                if (count[item]) {
+                  count[item] += 1;
+                  return;
+                }
+                count[item] = 1;
+              });
+
+              for (let prop in count) {
+                if (count[prop] >= 2) {
+                  return true;
+                }
+              }
+
+              console.log(count);
+              return false;
             }
-            count[item] = 1;
-          });
 
-          for (let prop in count) {
-            if (count[prop] >= 2) {
-              return true;
+            if(findSameOptions(argumentsPoll.options)){
+              reply(interaction, 'You can\'t have the same options')
             }
-          }
 
-          console.log(count);
-          return false;
+            var poll = {
+              id: pollId,
+              author: {
+                author: pollAuthor,
+                id: interaction.member.user.id,
+                avatar: userAvatar
+              },
+              channel_id: interaction.channel_id,
+              interaction_id: interaction.id,
+              interaction_token: interaction.token,
+              arguments: {
+                theme: pollTheme,
+                options: argumentsPoll.options,
+              },
+              responses: {},
+              getTotalResponses: function(){
+                let sum = 0
+                if(Object.keys(this.responses).length > 0){
+                  for(const property in this.responses){
+                    sum += this.responses[property].length
+                  }
+                }
+                return sum
+              }
+            };
+
+            let pollEmbed = new DiscordJs.MessageEmbed()
+              .setTitle(`Poll Theme : ${argumentsPoll.theme}`)
+              .setColor("#32908F")
+              .setFooter("HermesBot / Poll Feature")
+              .setAuthor(
+                "Poll started by " + interaction.member.user.username,
+                userAvatar
+              )
+              .setTimestamp();
+
+            let description = "";
+            for (const i in argumentsPoll.options) {
+              description += emojis[i] + " **" + argumentsPoll.options[i] + "** \n";
+            }
+            pollEmbed.setDescription(description);
+
+            let pollResponse = new buttons.MessageMenu()
+              .setPlaceholder("Select an option")
+              .setID("poll_" + pollId);
+
+            for (let j in argumentsPoll.options) {
+              poll.responses[argumentsPoll.options[j]] = []
+              const option = new buttons.MessageMenuOption()
+                .setLabel(argumentsPoll.options[j])
+                .setEmoji(emojis[j])
+                .setValue(argumentsPoll.options[j].toLowerCase());
+              pollResponse.addOption(option);
+            }
+            let actionRow = new buttons.MessageActionRow()
+              .addComponent(pollResponse);
+
+            activePolls.push(poll);
+            reply(interaction, "", pollEmbed, actionRow);
+            console.log(poll);
+            break
+          
+          case 'view':
+            break
         }
-
-        if(findSameOptions(argumentsPoll.options)){
-          reply(interaction, 'You can\'t have the same options')
-        }
-
-        var poll = {
-          id: pollId,
-          author: {
-            author: pollAuthor,
-            id: interaction.member.user.id,
-            avatar: userAvatar
-          },
-          channel_id: interaction.channel_id,
-          interaction_id: interaction.id,
-          interaction_token: interaction.token,
-          arguments: {
-            theme: pollTheme,
-            options: argumentsPoll.options,
-          },
-        };
-
-        let pollEmbed = new DiscordJs.MessageEmbed()
-          .setTitle(`Poll Theme : ${argumentsPoll.theme}`)
-          .setColor("#32908F")
-          .setFooter("HermesBot / Poll Feature")
-          .setAuthor(
-            "Poll started by " + interaction.member.user.username,
-            userAvatar
-          )
-          .setTimestamp();
-
-        let description = "";
-        for (const i in argumentsPoll.options) {
-          description += emojis[i] + " **" + argumentsPoll.options[i] + "** \n";
-        }
-        pollEmbed.setDescription(description);
-
-        let pollResponse = new buttons.MessageMenu()
-          .setPlaceholder("Select an option")
-          .setID("poll_" + pollId);
-
-        for (let j in argumentsPoll.options) {
-          const option = new buttons.MessageMenuOption()
-            .setLabel(argumentsPoll.options[j])
-            .setEmoji(emojis[j])
-            .setValue(argumentsPoll.options[j].toLowerCase());
-          pollResponse.addOption(option);
-        }
-        let actionRow = new buttons.MessageActionRow().addComponent(
-          pollResponse
-        );
-
-        activePolls.push(poll);
-        reply(interaction, "", pollEmbed, actionRow);
-        console.log(poll);
     }
   }
 });
