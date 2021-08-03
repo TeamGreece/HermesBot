@@ -158,6 +158,8 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
         if(activePolls.find(poll => poll.id === ids[1])){
           const poll = activePolls.find((poll) => poll.id === ids[1]);
           const selectedOption = interaction.data.values[0]
+          console.log(selectedOption)
+          console.log(typeof(selectedOption))
 
           for(const option in poll.responses){
             let arr = poll.responses[option]
@@ -586,7 +588,19 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
                   }
                 }
                 return sum
-              }
+              },
+              getRespondants: function(){
+                let arr = []
+                if(Object.keys(this.responses).length > 0){
+                  for(const property in this.responses){
+                    for(const person of this.responses[property]){
+                      let username = person.username
+                      arr.push(username)
+                    }
+                  }
+                }
+                return arr
+              },
             };
 
             let pollEmbed = new DiscordJs.MessageEmbed()
@@ -610,11 +624,13 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
               .setID("poll_" + pollId);
 
             for (let j in argumentsPoll.options) {
-              poll.responses[argumentsPoll.options[j]] = []
+              let label = argumentsPoll.options[j].toLowerCase()
+
+              poll.responses[label] = []
               const option = new buttons.MessageMenuOption()
                 .setLabel(argumentsPoll.options[j])
                 .setEmoji(emojis[j])
-                .setValue(argumentsPoll.options[j].toLowerCase());
+                .setValue(label);
               pollResponse.addOption(option);
             }
             let actionRow = new buttons.MessageActionRow()
@@ -626,6 +642,118 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
             break
           
           case 'view':
+            let userPolls = []
+            
+            let argumentsPollView = {}
+            let pollOptionsView = interaction.data.options[0].options;
+            if (pollOptionsView) {
+              for (const option of pollOptionsView) {
+                const { name, value } = option;
+                  argumentsPollView[name] = value;
+              }
+            }
+
+            userPolls = activePolls.filter(poll => poll.author.id === interaction.member.user.id) 
+            console.log(userPolls)
+                
+            if(userPolls.length === 0){
+              reply(interaction, 'You haven\'t authored any polls!')
+            }else if(userPolls.length === 1){
+              viewPoll(userPolls[0])
+            }else if(userPolls.length > 1){
+              if(argumentsPollView.int){
+                viewPoll(userPolls[argumentsPollView.int-1])
+              }else{
+                var pollViewMore = new DiscordJs.MessageEmbed()
+                  .setColor("#32908F")
+                  .setTitle("Multiple Polls Found!")
+                  .setDescription(
+                    "We found **" +
+                      userPolls.length +
+                      "** polls that you have conducted. To see them, please add the according number to the command(e.g. /meeting view int:1)"
+                  );
+                for (const p of userPolls) {
+                  pollViewMore.addField(
+                    `${userPolls.indexOf(p) + 1})`,
+                    p.arguments.theme,
+                    true
+                  );
+                }
+                reply(interaction, '', pollViewMore)
+              }
+            }
+
+            function viewPoll(poll){
+              let width = 600
+              let height = 600
+              let chart = {
+                type: "outlabeledPie",
+                options: {
+                  plugins: {
+                    legend: false,
+                    outlabels: {
+                      text: "%l %p",
+                      color: "white",
+                      stretch: 25,
+                      textAlign: "center",
+                      padding: 7,
+                      borderRadius: 5,
+                      font: {
+                        resizable: true,
+                        minSize: 25,
+                        maxSize: 30,
+                        weight: 'bold',
+                      },
+                    },
+                  },
+                },
+              };
+
+              let chartData = {
+                labels: [],
+                datasets: [
+                  {
+                    data: [],
+                    backgroundColor: [
+                      "#FF3784",
+                      "#36A2EB",
+                      "#4BC0C0",
+                      "#F77825",
+                      "#9966FF",
+                      "#B12693",
+                      "#20AC0C",
+                      "#EE3E2A",
+                      "#F6BC00",
+                    ],
+                  },
+                ],
+              };
+
+              for(const opt of poll.arguments.options){
+                let label = opt.charAt(0).toUpperCase() + opt.slice(1)
+                chartData.labels.push(label)
+              }
+
+              for(const key in poll.responses){
+                let responsePercent = poll.responses[key].length / poll.getTotalResponses() * 100
+                chartData.datasets[0].data.push(responsePercent)
+              }
+
+              chart['data'] = chartData
+
+              let chartUrl = `https://quickchart.io/chart?width=${width}&height=${height}&c=` + encodeURIComponent(JSON.stringify(chart))
+              console.log(chartUrl)
+
+              const pollView = new DiscordJs.MessageEmbed()
+                .setTitle('Results of poll: ' + poll.arguments.theme)
+                .setAuthor(poll.author.author, poll.author.avatar)
+                .setColor('#32908F')
+                .setDescription(`**Total Responses:** *${poll.getTotalResponses()}*\n  **Respondants:** *${poll.getRespondants()}*`)
+                .setImage(chartUrl)
+
+              reply(interaction, '', pollView)
+            }
+            
             break
         }
     }

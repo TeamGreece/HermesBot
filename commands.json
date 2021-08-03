@@ -201,7 +201,15 @@
                     "name": "view",
                     "description": "View a Poll you have authored",
                     "type": 1,
-                    "options": []
+                    "options": [
+                        {
+                            "name": "int",
+                            "description": "Define the poll that you want to view",
+                            "type": 4,
+                            "options": []
+                            
+                        }
+                    ]
                 }
             ]
         }
