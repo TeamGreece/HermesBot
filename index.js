@@ -307,6 +307,8 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
               activeMeetings = activeMeetings.filter(
                 (m) => m.id !== interaction.id
               );
+              console.log('Meeting Removed! Active Meetings Count: ' + activeMeetings.length)
+
             }, timeDifference); // + 300000)
             console.log(activeMeetings.indexOf(meeting));
             // console.log(activeMeetings = meeting.yesPeople.filter(p => p.id !== person.id))
@@ -468,22 +470,22 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
                     { name: "Reacted with: NO", value: meetingNoView || "-" }
                   );
                 var meetingViewMore = new DiscordJs.MessageEmbed()
-                  .setColor("##3769d4")
+                  .setColor("#3769d4")
                   .setTitle("Multiple Meetings Found!")
-                  .setDescription(
-                    "We found **" +
-                      meetingCounter +
-                      "** meetings that you have organised. To see them, please add the according number to the command(e.g. /meeting view int:1)"
-                  );
+
+                  let description = "We found **" +
+                    meetingCounter +
+                    "** meetings that you have organised. To see them, please add the according number to the command(e.g. /meeting view int:1)\n"
+                    
                 for (const m of activeMeetings) {
                   if (m.author.id === meetingviewAuthor) {
-                    meetingViewMore.addField(
-                      `${activeMeetings.indexOf(m) + 1})`,
-                      m.arguments.theme,
-                      true
-                    );
+                    description += 
+                      `**${activeMeetings.indexOf(m) + 1})** ` + 
+                      m.arguments.theme.charAt(0).toUpperCase() + m.arguments.theme.slice(1) + "\n"
+                    
                   }
                 }
+                meetingViewMore.setDescription(description)
                 if (!isNaN(argumentsView["int"])) {
                   if (argumentsView["int"] == meetingCounter) {
                     reply(interaction, "", meetingView);
