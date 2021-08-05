@@ -151,7 +151,7 @@
                             "name": "option_2",
                             "description": "The second option of the poll",
                             "type": 3,
-                            "required": false
+                            "required": true
                         },
                         {
                             "name": "option_3",

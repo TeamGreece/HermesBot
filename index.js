@@ -8,11 +8,14 @@ const client = new DiscordJs.Client();
 buttons(client);
 
 const guildId = "705044568047091815";
+const appId = "705848696419516488"; 
+// const appId = "698118414954266635";
+// const guildId = "579172257746649111";
 
 const commandRegisterOptions = {
   hostname: "discord.com",
   port: 443,
-  path: `/api/v8/applications/705848696419516488/guilds/${guildId}/commands`,
+  path: `/api/v8/applications/${appId}/guilds/${guildId}/commands`,
   method: "PUT",
   headers: {
     Authorization: `Bot ${process.env.TOKEN}`,
@@ -171,13 +174,15 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
           }
           poll.responses[selectedOption].push(person)
           console.log(poll)
-          console.log(poll.getTotalResponses())
+        //   console.log(interaction.member.user.username)
+        //   console.log(poll.getTotalResponses())
+        //   console.log(poll)
 
           let pollResEmbed = new DiscordJs.MessageEmbed()
             .setColor("#7289DA")
             .setTitle("Poll " + poll.arguments.theme)
-            .setDescription(`<@${poll.author.id}> reacted with ${selectedOption}`)
-            .setFooter("Poll Reaction", poll.author.avatar)
+            .setDescription(`<@${interaction.member.user.id}> reacted with ***${selectedOption}***`)
+            .setFooter("Poll Reaction", `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`)
             .setTimestamp();
           reply(interaction, '', pollResEmbed)
         }
@@ -280,7 +285,7 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
             }
 
             let timeDifference = messageTime - currentTimeMs;
-            timeDifference -= 300000;
+            // timeDifference -= 300000;
             if (timeDifference < 0) {
               timeDifference = 500;
             }
@@ -798,11 +803,12 @@ client.on("message", (message) => {
     setTimeout(function () {
       message.channel.bulkDelete(1);
     }, 4000);
-    console.log("New Attachment");
+    // console.log("New Attachment");
     // console.log(Attachment[0].url);
     // bot.channels.cache.get('696005900863012866').send('Attachment sent by ' + message.member.user.tag + ' in ' + "<#" + message.channel.id + '>   ' + Attachment[0].url);
     client.channels.cache
       .get("711249792151453697")
+    //   .get("696005900863012866")
       .send(
         "Attachment sent by " +
           message.member.user.tag +
