@@ -301,7 +301,7 @@ client.ws.on("INTERACTION_CREATE", async (interaction) => {
                   meetingTheme +
                   "** by **" +
                   meetingAuthor +
-                  "** starts in __**5 Minutes**__!\n\nMeeting regards: " +
+                  "** starts __**NOW**__!\n\nMeeting regards: " +
                   notifees
               );
             setTimeout(function () {
